@@ -33,5 +33,5 @@ Transforming Open Source Collaboration into a Scalable, Gamified Ecosystem Power
 ```bash
 git clone <your-repo-url>
 cd the-collaborator
-npm install
-npm run dev
+pnpm install
+pnpm dev
