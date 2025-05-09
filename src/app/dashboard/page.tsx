@@ -16,6 +16,7 @@ import ProfileCard from "@/components/dashboard/ProfileCard";
 import { useRouter } from "next/navigation";
 import { redirect, useSearchParams } from 'next/navigation'
 import WalletConnect from "@/components/dashboard/WalletConnect";
+import { SignOut } from "@/components/dashboard/signout-button";
 
 const colors = ["#ebf6ff", "#7dd3fc", "#38bdf8", "#0ea5e9", "#0369a1"];
 
@@ -235,11 +236,7 @@ export default function Dashboard() {
         <div className="flex items-center gap-4">
           {" "}
           {/* Wrap title and button */}
-          <button
-            className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm"
-          >
-            &larr; Log Out {/* Left arrow */}
-          </button>
+          <SignOut />
           <h1 className="text-4xl">Dashboard</h1>
         </div>
         {/* Use the new WalletConnect component */}
