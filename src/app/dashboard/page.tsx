@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, useEffect } from "react";
 
@@ -14,10 +14,15 @@ import { WalletSendTransactionError } from "@solana/wallet-adapter-base"; // <--
 import ProfileCard from "@/components/dashboard/ProfileCard";
 
 import { useRouter } from "next/navigation";
-import { redirect, useSearchParams } from 'next/navigation'
+import { redirect, useSearchParams } from "next/navigation";
 import WalletConnect from "@/components/dashboard/WalletConnect";
-import { SignOut } from "@/components/dashboard/signout-button";
 
+("use client");
+import { signOut } from "next-auth/react";
+
+export function SignOut() {
+  return <button onClick={() => signOut({ redirectTo: "/" })}>Sign Out</button>;
+}
 const colors = ["#ebf6ff", "#7dd3fc", "#38bdf8", "#0ea5e9", "#0369a1"];
 
 // 1. Define types for the API response
@@ -236,7 +241,12 @@ export default function Dashboard() {
         <div className="flex items-center gap-4">
           {" "}
           {/* Wrap title and button */}
-          <SignOut />
+          <button
+            className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm"
+            onClick={() => signOut({ redirectTo: "/" })}
+          >
+            &larr; Log Out {/* Left arrow */}
+          </button>
           <h1 className="text-4xl">Dashboard</h1>
         </div>
         {/* Use the new WalletConnect component */}
