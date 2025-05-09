@@ -17,12 +17,10 @@ import { useRouter } from "next/navigation";
 import { redirect, useSearchParams } from "next/navigation";
 import WalletConnect from "@/components/dashboard/WalletConnect";
 
-("use client");
+
 import { signOut } from "next-auth/react";
 
-export function SignOut() {
-  return <button onClick={() => signOut({ redirectTo: "/" })}>Sign Out</button>;
-}
+
 const colors = ["#ebf6ff", "#7dd3fc", "#38bdf8", "#0ea5e9", "#0369a1"];
 
 // 1. Define types for the API response
@@ -239,8 +237,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-black text-white p-8">
       <div className="flex justify-between items-start mb-6">
         <div className="flex items-center gap-4">
-          {" "}
-          {/* Wrap title and button */}
+                   {/* Wrap title and button */}
           <button
             className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm"
             onClick={() => signOut({ redirectTo: "/" })}
