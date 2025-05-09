@@ -1,6 +1,6 @@
 # The Collaborator
 
-![Project Banner](public/next.svg) <!-- Replace with your own banner in public/ if desired -->
+![Project Banner](public/logo.png) <!-- Replace with your own banner in public/ if desired -->
 
 Transforming Open Source Collaboration into a Scalable, Gamified Ecosystem Powered by Blockchain
 
