@@ -9,7 +9,6 @@ import {
   getAssociatedTokenAddress,
   createAssociatedTokenAccountInstruction, // <-- Add this import
 } from "@solana/spl-token";
-import { Buffer } from "buffer";
 import bs58 from "bs58";
 import { WalletSendTransactionError } from "@solana/wallet-adapter-base"; // <-- Import specific error type
 import ProfileCard from "@/components/dashboard/ProfileCard";
@@ -207,28 +206,28 @@ export default function Dashboard() {
 
   const location = useSearchParams();
 
-  useEffect(() => {
-    const authToken = localStorage.getItem("auth_token");
-    if (!authToken) {
-      redirect("/");
-    }
-    const queryParams = new URLSearchParams(location);
-    const token = queryParams.get("token");
+  // useEffect(() => {
+  //   const authToken = localStorage.getItem("auth_token");
+  //   if (!authToken) {
+  //     redirect("/");
+  //   }
+  //   const queryParams = new URLSearchParams(location);
+  //   const token = queryParams.get("token");
 
-    if (token) {
-      localStorage.setItem("auth_token", token);
+  //   if (token) {
+  //     localStorage.setItem("auth_token", token);
 
-      // OPTIONAL: Remove token from URL
-      redirect("/dashboard");
-    }
-  }, [location, navigate]);
+  //     // OPTIONAL: Remove token from URL
+  //     redirect("/dashboard");
+  //   }
+  // }, [location, navigate]);
 
-  const handleLogout = () => {
-    // Clear the auth token from local storage
-    localStorage.removeItem("auth_token");
-    // Navigate back to the home page
-    redirect("/");
-  };
+  // const handleLogout = () => {
+  //   // Clear the auth token from local storage
+  //   localStorage.removeItem("auth_token");
+  //   // Navigate back to the home page
+  //   redirect("/");
+  // };
 
   return (
     <div className="min-h-screen bg-black text-white p-8">
@@ -237,7 +236,6 @@ export default function Dashboard() {
           {" "}
           {/* Wrap title and button */}
           <button
-            onClick={handleLogout} // Go back one step in history
             className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm"
           >
             &larr; Log Out {/* Left arrow */}
