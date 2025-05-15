@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, useEffect } from "react";
 
@@ -14,8 +14,9 @@ import { WalletSendTransactionError } from "@solana/wallet-adapter-base"; // <--
 import ProfileCard from "@/components/dashboard/ProfileCard";
 
 import { useRouter } from "next/navigation";
-import { redirect, useSearchParams } from 'next/navigation'
+import { redirect, useSearchParams } from "next/navigation";
 import WalletConnect from "@/components/dashboard/WalletConnect";
+import { useSession } from "next-auth/react";
 
 const colors = ["#ebf6ff", "#7dd3fc", "#38bdf8", "#0ea5e9", "#0369a1"];
 
@@ -50,6 +51,7 @@ export default function Dashboard() {
   const navigate = useRouter();
   const { connection } = useConnection();
   const { publicKey, sendTransaction } = useWallet();
+  const { data: session, status: sessionStatus } = useSession();
 
   const handleClaimTokens = async () => {
     if (!publicKey || !sendTransaction) {
@@ -179,55 +181,11 @@ export default function Dashboard() {
 
   // --- FETCH DATA FROM API (or local file for now) ---
   useEffect(() => {
-    setLoading(false); // Start loading
-    // GithubService.getGithubRESPONSEUrl()
-    //   .then((data: ApiResponse) => {
-    //     setCommitData(transformReportData(data.report_data));
-    //     setUserProfile({
-    //       imageUrl: data.user.avatar,
-    //       name: data.user.name,
-    //       username: data.user.username,
-    //       memberSince: `Member since ${data.user.since}`,
-    //     });
-    //     setTotalCommits(data.total_commits);
-    //     // Initialize tokensHeld based on API, allow claiming to reduce it
-    //     setTokensHeld(Math.floor(data.tokens));
-    //     // Note: tokensClaimed should likely be fetched or persisted elsewhere
-    //     // For now, it resets on component mount.
-    //     setTokensClaimed(0);
-    //   })
-    //   .catch((err: any) => {
-    //     console.error("Failed to load dashboard data:", err);
-    //     alert("Failed to load dashboard data. Please try again later.");
-    //     // Handle navigation or state update on error if needed
-    //   })
-    //   .finally(() => setLoading(false));
-  }, []); // Dependency array is empty, runs once on mount
+    if (sessionStatus === "loading") setLoading(true);
+    else setLoading(false);
+  }, [sessionStatus]);
 
   const location = useSearchParams();
-
-  // useEffect(() => {
-  //   const authToken = localStorage.getItem("auth_token");
-  //   if (!authToken) {
-  //     redirect("/");
-  //   }
-  //   const queryParams = new URLSearchParams(location);
-  //   const token = queryParams.get("token");
-
-  //   if (token) {
-  //     localStorage.setItem("auth_token", token);
-
-  //     // OPTIONAL: Remove token from URL
-  //     redirect("/dashboard");
-  //   }
-  // }, [location, navigate]);
-
-  // const handleLogout = () => {
-  //   // Clear the auth token from local storage
-  //   localStorage.removeItem("auth_token");
-  //   // Navigate back to the home page
-  //   redirect("/");
-  // };
 
   return (
     <div className="min-h-screen bg-black text-white p-8">
@@ -235,9 +193,7 @@ export default function Dashboard() {
         <div className="flex items-center gap-4">
           {" "}
           {/* Wrap title and button */}
-          <button
-            className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm"
-          >
+          <button className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm">
             &larr; Log Out {/* Left arrow */}
           </button>
           <h1 className="text-4xl">Dashboard</h1>
@@ -248,10 +204,13 @@ export default function Dashboard() {
 
       {/* Use the new ProfileCard component */}
       <ProfileCard
-        imageUrl={userProfile.imageUrl}
-        name={userProfile.name}
-        username={userProfile.username}
-        memberSince={userProfile.memberSince}
+        imageUrl={session?.user?.image}
+        name={session?.user?.name}
+        username={session?.user.tokens.toString()}
+        memberSince={session?.user?.createdAt ? new Date(session.user.createdAt).toLocaleDateString(
+          "en-US",
+          { year: "numeric", month: "short", day: "numeric" }
+        ) : ""}
         className="mb-10"
       />
 
