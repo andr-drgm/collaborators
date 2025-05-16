@@ -11,6 +11,7 @@ import { clusterApiUrl } from "@solana/web3.js";
 import { useMemo } from "react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import Providers from "./Providers";
+import { SessionProvider } from "next-auth/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -53,7 +54,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          {children}
+          <SessionProvider>{children}</SessionProvider>
         </Providers>
       </body>
     </html>
