@@ -18,9 +18,8 @@ import { redirect, useSearchParams } from "next/navigation";
 import WalletConnect from "@/components/dashboard/WalletConnect";
 import { useSession } from "next-auth/react";
 
-
 import { signOut } from "next-auth/react";
-
+import { getCommits } from "@/services/github";
 
 const colors = ["#ebf6ff", "#7dd3fc", "#38bdf8", "#0ea5e9", "#0369a1"];
 
@@ -56,6 +55,89 @@ export default function Dashboard() {
   const { connection } = useConnection();
   const { publicKey, sendTransaction } = useWallet();
   const { data: session, status: sessionStatus } = useSession();
+
+  // --- NEW: loading state ---
+  const [loading, setLoading] = useState(false);
+
+  // --- NEW STATE for API data ---
+  const [commitData, setCommitData] = useState<{ date: Date; count: number }[]>(
+    []
+  );
+  const [userProfile, setUserProfile] = useState<{
+    imageUrl: string;
+    name: string;
+    username: string;
+    memberSince: string;
+  }>({
+    imageUrl: "",
+    name: "",
+    username: "",
+    memberSince: "",
+  });
+  const [totalCommits, setTotalCommits] = useState(0);
+  const [tokensHeld, setTokensHeld] = useState(0);
+
+  // --- FETCH GITHUB COMMITS DATA ---
+  useEffect(() => {
+    const fetchCommits = async () => {
+      try {
+        setLoading(true);
+        const commits = await getCommits();
+
+        // Transform commits into the format expected by the chart
+        const commitCounts: { [date: string]: number } = {};
+
+        commits.forEach((commit: any) => {
+          if (commit.commit?.author?.date) {
+            const commitDate = new Date(commit.commit.author.date);
+            const dateKey = commitDate.toISOString().split("T")[0]; // YYYY-MM-DD format
+
+            if (commitCounts[dateKey]) {
+              commitCounts[dateKey]++;
+            } else {
+              commitCounts[dateKey] = 1;
+            }
+          }
+        });
+
+        // Transform to the format expected by the chart
+        const transformedData = Object.entries(commitCounts).map(
+          ([dateStr, count]) => ({
+            date: new Date(dateStr),
+            count,
+          })
+        );
+
+        setCommitData(transformedData);
+        setTotalCommits(commits.length);
+
+        // Calculate tokens based on total commits (1 token per commit for now)
+        setTokensHeld(commits.length);
+      } catch (error) {
+        console.error("Error fetching commits:", error);
+        // Fallback to empty data
+        setCommitData([]);
+        setTotalCommits(0);
+        setTokensHeld(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (sessionStatus === "authenticated") {
+      fetchCommits();
+    }
+  }, [sessionStatus]);
+
+  // --- LOADING STATE FOR SESSION ---
+  useEffect(() => {
+    if (sessionStatus === "loading") setLoading(true);
+    else if (sessionStatus === "unauthenticated") {
+      setLoading(false);
+      // Redirect to login if not authenticated
+      navigate.push("/");
+    }
+  }, [sessionStatus, navigate]);
 
   const handleClaimTokens = async () => {
     if (!publicKey || !sendTransaction) {
@@ -162,40 +244,13 @@ export default function Dashboard() {
     }
   };
 
-  // --- NEW: loading state ---
-  const [loading, setLoading] = useState(false);
-
-  // --- NEW STATE for API data ---
-  const [commitData, setCommitData] = useState<{ date: Date; count: number }[]>(
-    []
-  );
-  const [userProfile, setUserProfile] = useState<{
-    imageUrl: string;
-    name: string;
-    username: string;
-    memberSince: string;
-  }>({
-    imageUrl: "",
-    name: "",
-    username: "",
-    memberSince: "",
-  });
-  const [totalCommits, setTotalCommits] = useState(0);
-  const [tokensHeld, setTokensHeld] = useState(0);
-
-  // --- FETCH DATA FROM API (or local file for now) ---
-  useEffect(() => {
-    if (sessionStatus === "loading") setLoading(true);
-    else setLoading(false);
-  }, [sessionStatus]);
-
   const location = useSearchParams();
 
   return (
     <div className="min-h-screen bg-black text-white p-8">
       <div className="flex justify-between items-start mb-6">
         <div className="flex items-center gap-4">
-                   {/* Wrap title and button */}
+          {/* Wrap title and button */}
           <button
             className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm"
             onClick={() => signOut({ redirectTo: "/" })}
@@ -213,10 +268,15 @@ export default function Dashboard() {
         imageUrl={session?.user?.image}
         name={session?.user?.name}
         username={session?.user.tokens.toString()}
-        memberSince={session?.user?.createdAt ? new Date(session.user.createdAt).toLocaleDateString(
-          "en-US",
-          { year: "numeric", month: "short", day: "numeric" }
-        ) : ""}
+        memberSince={
+          session?.user?.createdAt
+            ? new Date(session.user.createdAt).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+            : ""
+        }
         className="mb-10"
       />
 
