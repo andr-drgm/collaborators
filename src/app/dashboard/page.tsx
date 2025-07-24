@@ -53,7 +53,7 @@ export default function Dashboard() {
   const [tokensClaimed, setTokensClaimed] = useState<number>(0);
   const navigate = useRouter();
   const { connection } = useConnection();
-  const { publicKey, sendTransaction } = useWallet();
+  const { publicKey, sendTransaction, disconnect } = useWallet();
 
   const handleClaimTokens = async () => {
     if (!publicKey || !sendTransaction) {
@@ -226,12 +226,11 @@ export default function Dashboard() {
   //   }
   // }, [location, navigate]);
 
-  // const handleLogout = () => {
-  //   // Clear the auth token from local storage
-  //   localStorage.removeItem("auth_token");
-  //   // Navigate back to the home page
-  //   redirect("/");
-  // };
+   const handleLogout = () => {
+    disconnect()    
+    signOut({ redirectTo: "/" })
+
+  };
 
   return (
     <div className="min-h-screen bg-black text-white p-8">
@@ -240,7 +239,7 @@ export default function Dashboard() {
                    {/* Wrap title and button */}
           <button
             className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm"
-            onClick={() => signOut({ redirectTo: "/" })}
+            onClick={handleLogout}
           >
             &larr; Log Out {/* Left arrow */}
           </button>
