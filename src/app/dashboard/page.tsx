@@ -16,10 +16,10 @@ import ProfileCard from "@/components/dashboard/ProfileCard";
 import { useRouter } from "next/navigation";
 import { redirect, useSearchParams } from "next/navigation";
 import WalletConnect from "@/components/dashboard/WalletConnect";
-
+import { useSession } from "next-auth/react";
 
 import { signOut } from "next-auth/react";
-
+import { getCommits } from "@/services/github";
 
 const colors = ["#ebf6ff", "#7dd3fc", "#38bdf8", "#0ea5e9", "#0369a1"];
 
@@ -54,6 +54,90 @@ export default function Dashboard() {
   const navigate = useRouter();
   const { connection } = useConnection();
   const { publicKey, sendTransaction, disconnect } = useWallet();
+  const { data: session, status: sessionStatus } = useSession();
+
+  // --- NEW: loading state ---
+  const [loading, setLoading] = useState(false);
+
+  // --- NEW STATE for API data ---
+  const [commitData, setCommitData] = useState<{ date: Date; count: number }[]>(
+    []
+  );
+  const [userProfile, setUserProfile] = useState<{
+    imageUrl: string;
+    name: string;
+    username: string;
+    memberSince: string;
+  }>({
+    imageUrl: "",
+    name: "",
+    username: "",
+    memberSince: "",
+  });
+  const [totalCommits, setTotalCommits] = useState(0);
+  const [tokensHeld, setTokensHeld] = useState(0);
+
+  // --- FETCH GITHUB COMMITS DATA ---
+  useEffect(() => {
+    const fetchCommits = async () => {
+      try {
+        setLoading(true);
+        const commits = await getCommits();
+
+        // Transform commits into the format expected by the chart
+        const commitCounts: { [date: string]: number } = {};
+
+        commits.forEach((commit: any) => {
+          if (commit.commit?.author?.date) {
+            const commitDate = new Date(commit.commit.author.date);
+            const dateKey = commitDate.toISOString().split("T")[0]; // YYYY-MM-DD format
+
+            if (commitCounts[dateKey]) {
+              commitCounts[dateKey]++;
+            } else {
+              commitCounts[dateKey] = 1;
+            }
+          }
+        });
+
+        // Transform to the format expected by the chart
+        const transformedData = Object.entries(commitCounts).map(
+          ([dateStr, count]) => ({
+            date: new Date(dateStr),
+            count,
+          })
+        );
+
+        setCommitData(transformedData);
+        setTotalCommits(commits.length);
+
+        // Calculate tokens based on total commits (1 token per commit for now)
+        setTokensHeld(commits.length);
+      } catch (error) {
+        console.error("Error fetching commits:", error);
+        // Fallback to empty data
+        setCommitData([]);
+        setTotalCommits(0);
+        setTokensHeld(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (sessionStatus === "authenticated") {
+      fetchCommits();
+    }
+  }, [sessionStatus]);
+
+  // --- LOADING STATE FOR SESSION ---
+  useEffect(() => {
+    if (sessionStatus === "loading") setLoading(true);
+    else if (sessionStatus === "unauthenticated") {
+      setLoading(false);
+      // Redirect to login if not authenticated
+      navigate.push("/");
+    }
+  }, [sessionStatus, navigate]);
 
   const handleClaimTokens = async () => {
     if (!publicKey || !sendTransaction) {
@@ -160,83 +244,16 @@ export default function Dashboard() {
     }
   };
 
-  // --- NEW: loading state ---
-  const [loading, setLoading] = useState(false);
-
-  // --- NEW STATE for API data ---
-  const [commitData, setCommitData] = useState<{ date: Date; count: number }[]>(
-    []
-  );
-  const [userProfile, setUserProfile] = useState<{
-    imageUrl: string;
-    name: string;
-    username: string;
-    memberSince: string;
-  }>({
-    imageUrl: "",
-    name: "",
-    username: "",
-    memberSince: "",
-  });
-  const [totalCommits, setTotalCommits] = useState(0);
-  const [tokensHeld, setTokensHeld] = useState(0);
-
-  // --- FETCH DATA FROM API (or local file for now) ---
-  useEffect(() => {
-    setLoading(false); // Start loading
-    // GithubService.getGithubRESPONSEUrl()
-    //   .then((data: ApiResponse) => {
-    //     setCommitData(transformReportData(data.report_data));
-    //     setUserProfile({
-    //       imageUrl: data.user.avatar,
-    //       name: data.user.name,
-    //       username: data.user.username,
-    //       memberSince: `Member since ${data.user.since}`,
-    //     });
-    //     setTotalCommits(data.total_commits);
-    //     // Initialize tokensHeld based on API, allow claiming to reduce it
-    //     setTokensHeld(Math.floor(data.tokens));
-    //     // Note: tokensClaimed should likely be fetched or persisted elsewhere
-    //     // For now, it resets on component mount.
-    //     setTokensClaimed(0);
-    //   })
-    //   .catch((err: any) => {
-    //     console.error("Failed to load dashboard data:", err);
-    //     alert("Failed to load dashboard data. Please try again later.");
-    //     // Handle navigation or state update on error if needed
-    //   })
-    //   .finally(() => setLoading(false));
-  }, []); // Dependency array is empty, runs once on mount
-
   const location = useSearchParams();
-
-  // useEffect(() => {
-  //   const authToken = localStorage.getItem("auth_token");
-  //   if (!authToken) {
-  //     redirect("/");
-  //   }
-  //   const queryParams = new URLSearchParams(location);
-  //   const token = queryParams.get("token");
-
-  //   if (token) {
-  //     localStorage.setItem("auth_token", token);
-
-  //     // OPTIONAL: Remove token from URL
-  //     redirect("/dashboard");
-  //   }
-  // }, [location, navigate]);
-
-   const handleLogout = () => {
-    disconnect()    
-    signOut({ redirectTo: "/" })
-
+  const handleLogout = () => {
+    disconnect();
+    signOut({ redirectTo: "/" });
   };
-
   return (
     <div className="min-h-screen bg-black text-white p-8">
       <div className="flex justify-between items-start mb-6">
         <div className="flex items-center gap-4">
-                   {/* Wrap title and button */}
+          {/* Wrap title and button */}
           <button
             className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm"
             onClick={handleLogout}
@@ -251,10 +268,18 @@ export default function Dashboard() {
 
       {/* Use the new ProfileCard component */}
       <ProfileCard
-        imageUrl={userProfile.imageUrl}
-        name={userProfile.name}
-        username={userProfile.username}
-        memberSince={userProfile.memberSince}
+        imageUrl={session?.user?.image}
+        name={session?.user?.name}
+        username={session?.user.tokens.toString()}
+        memberSince={
+          session?.user?.createdAt
+            ? new Date(session.user.createdAt).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+            : ""
+        }
         className="mb-10"
       />
 
