@@ -14,7 +14,6 @@ import { WalletSendTransactionError } from "@solana/wallet-adapter-base"; // <--
 import ProfileCard from "@/components/dashboard/ProfileCard";
 
 import { useRouter } from "next/navigation";
-import { redirect, useSearchParams } from "next/navigation";
 import WalletConnect from "@/components/dashboard/WalletConnect";
 import { useSession } from "next-auth/react";
 
@@ -22,30 +21,6 @@ import { signOut } from "next-auth/react";
 import { getCommits } from "@/services/github";
 
 const colors = ["#ebf6ff", "#7dd3fc", "#38bdf8", "#0ea5e9", "#0369a1"];
-
-// 1. Define types for the API response
-interface ApiResponse {
-  success: boolean;
-  report_data: { [date: string]: number };
-  user: {
-    name: string;
-    email: string;
-    username: string;
-    avatar: string;
-    since: string;
-  };
-  total_commits: number;
-  tokens: number;
-}
-
-// 2. Utility to transform report_data into an array for the grid
-function transformReportData(report_data: { [date: string]: number }) {
-  // Convert to array of { date: Date, count: number }
-  return Object.entries(report_data).map(([dateStr, count]) => ({
-    date: new Date(dateStr.split("-").reverse().join("-")), // "dd-mm-yyyy" to "yyyy-mm-dd"
-    count,
-  }));
-}
 
 export default function Dashboard() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -63,17 +38,6 @@ export default function Dashboard() {
   const [commitData, setCommitData] = useState<{ date: Date; count: number }[]>(
     []
   );
-  const [userProfile, setUserProfile] = useState<{
-    imageUrl: string;
-    name: string;
-    username: string;
-    memberSince: string;
-  }>({
-    imageUrl: "",
-    name: "",
-    username: "",
-    memberSince: "",
-  });
   const [totalCommits, setTotalCommits] = useState(0);
   const [tokensHeld, setTokensHeld] = useState(0);
 
@@ -87,6 +51,7 @@ export default function Dashboard() {
         // Transform commits into the format expected by the chart
         const commitCounts: { [date: string]: number } = {};
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         commits.forEach((commit: any) => {
           if (commit.commit?.author?.date) {
             const commitDate = new Date(commit.commit.author.date);
@@ -244,7 +209,6 @@ export default function Dashboard() {
     }
   };
 
-  const location = useSearchParams();
   const handleLogout = () => {
     disconnect();
     signOut({ redirectTo: "/" });
