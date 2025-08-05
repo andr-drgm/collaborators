@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Octokit } from "@octokit/core";
+import { auth } from "@/auth";
 
 const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN,
 });
 
 export async function GET(request: NextRequest) {
+  const session = await auth();
   try {
     const response = await octokit.request(
       "GET /repos/{owner}/{repo}/commits",
       {
         owner: "andr-drgm",
         repo: "the-collaborator",
-        per_page: 100, // Get more commits
+        committer: session?.user.username,
       }
     );
 
