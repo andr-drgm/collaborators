@@ -5,7 +5,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 
 declare module "next-auth" {
   interface User {
-    username?: string
+    username?: string;
   }
   interface Session {
     user: {
@@ -21,7 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [GitHub],
   callbacks: {
-    async session({ session, token }) {
+    async session({ session }) {
       session.user = {
         ...session.user,
         username: session.user.username as string,
@@ -31,22 +31,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       };
       return session;
     },
-    async signIn({ user, account }) { 
-      if (account?.provider === 'github' && user && !user?.username) {
+    async signIn({ user, account }) {
+      if (account?.provider === "github" && user && !user?.username) {
         try {
-          const response = await fetch('https://api.github.com/user', {
-            headers: { Authorization: `token ${account.access_token}` }
+          const response = await fetch("https://api.github.com/user", {
+            headers: { Authorization: `token ${account.access_token}` },
           });
           const githubData = await response.json();
-          const updateResult = await prisma.user.update({
+          await prisma.user.update({
             where: { id: user.id },
-            data: { username: githubData.login }
+            data: { username: githubData.login },
           });
         } catch (error) {
-          console.error('Username update failed:', error);
+          console.error("Username update failed:", error);
         }
       }
       return true;
-    }
+    },
   },
 });
