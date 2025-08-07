@@ -19,15 +19,24 @@ declare module "next-auth" {
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  providers: [GitHub],
+  providers: [
+    GitHub({
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
+    }),
+  ],
   callbacks: {
-    async session({ session }) {
+    async session({ session, user }) {
+      const dbUser = await prisma.user.findUnique({
+        where: { id: user.id },
+      });
+
       session.user = {
         ...session.user,
-        username: session.user.username as string,
-        tokens: session.user.tokens as number,
-        createdAt: session.user.createdAt as Date,
-        login: session.user.login as string,
+        username: dbUser?.username || session.user.name || "",
+        tokens: dbUser?.tokens || 0,
+        createdAt: dbUser?.createdAt || new Date(),
+        login: dbUser?.username || session.user.name || "",
       };
       return session;
     },
@@ -37,6 +46,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const response = await fetch("https://api.github.com/user", {
             headers: { Authorization: `token ${account.access_token}` },
           });
+
+          if (!response.ok) {
+            console.error("GitHub API error:", response.statusText);
+            return true;
+          }
+
           const githubData = await response.json();
           await prisma.user.update({
             where: { id: user.id },
@@ -49,4 +64,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return true;
     },
   },
+  pages: {
+    signIn: "/auth/signin",
+    error: "/auth/error",
+  },
+  debug: process.env.NODE_ENV === "development",
 });
