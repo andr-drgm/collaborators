@@ -9,7 +9,7 @@ export default function SignIn() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-white mb-2">
-            Sign in to The Collaborator
+            Sign in to Collab0rator
           </h2>
           <p className="text-gray-300 mb-8">
             Connect your GitHub account to get started
