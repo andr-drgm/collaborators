@@ -224,7 +224,8 @@ export default function Home() {
             Coming Soon
           </h2>
           <p className="text-xl text-gray-300 mb-12">
-            We're building the future of developer collaboration and rewards
+            We&apos;re building the future of developer collaboration and
+            rewards
           </p>
 
           <div className="grid md:grid-cols-3 gap-8">
