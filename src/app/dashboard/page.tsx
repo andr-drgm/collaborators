@@ -26,6 +26,7 @@ export default function Dashboard() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [hoveredWeek, setHoveredWeek] = useState<number | null>(null);
   const [tokensClaimed, setTokensClaimed] = useState<number>(0);
+  const [showHelp, setShowHelp] = useState<string | null>(null);
   const navigate = useRouter();
   const { connection } = useConnection();
   const { publicKey, sendTransaction, disconnect } = useWallet();
@@ -213,13 +214,23 @@ export default function Dashboard() {
     disconnect();
     signOut({ redirectTo: "/" });
   };
+
+  const helpContent = {
+    wallet:
+      "Need help setting up your wallet? We support Phantom, Solflare, and other Solana wallets. Make sure you have some SOL for transaction fees.",
+    commits:
+      "This chart shows your GitHub contribution activity. Darker colors indicate more commits on that day. Hover over squares to see details.",
+    tokens:
+      "Tokens are earned based on your GitHub contributions. Each meaningful contribution (commits, PRs, reviews) earns you SOL tokens that you can claim to your wallet.",
+  };
+
   return (
     <div className="min-h-screen bg-black text-white p-8">
       <div className="flex justify-between items-start mb-6">
         <div className="flex items-center gap-4">
           {/* Wrap title and button */}
           <button
-            className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm"
+            className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm transition-colors"
             onClick={handleLogout}
           >
             &larr; Log Out {/* Left arrow */}
@@ -229,6 +240,42 @@ export default function Dashboard() {
         {/* Use the new WalletConnect component */}
         <WalletConnect />
       </div>
+
+      {/* Onboarding Banner */}
+      {!publicKey && (
+        <div className="mb-8 p-4 bg-gradient-to-r from-blue-900/50 to-cyan-900/50 border border-blue-500/30 rounded-lg">
+          <div className="flex items-center gap-3">
+            <svg
+              className="w-6 h-6 text-blue-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <div>
+              <h3 className="font-semibold text-blue-200">
+                Connect Your Wallet to Start Earning
+              </h3>
+              <p className="text-blue-300 text-sm">
+                Link your Solana wallet to claim SOL tokens for your GitHub
+                contributions
+              </p>
+            </div>
+            <button
+              className="ml-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-sm transition-colors"
+              onClick={() => setShowHelp("wallet")}
+            >
+              Need Help?
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Use the new ProfileCard component */}
       <ProfileCard
@@ -263,9 +310,36 @@ export default function Dashboard() {
             </div>
           </div>
         )}
+
         {/* Chart Section - Full Width, GitHub-style, no scroll */}
         <div className="w-full flex flex-col items-center">
           <div className="relative w-full max-w-7xl">
+            {/* Chart Header with Help */}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-white">
+                Contribution Activity
+              </h2>
+              <button
+                className="text-gray-400 hover:text-white transition-colors p-2"
+                onMouseEnter={() => setShowHelp("commits")}
+                onMouseLeave={() => setShowHelp(null)}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </button>
+            </div>
+
             {/* Month Labels */}
             <div className="flex pl-12 pr-2 mb-1 text-xs text-gray-400 font-medium select-none w-full">
               {(() => {
@@ -445,13 +519,35 @@ export default function Dashboard() {
 
         {/* Stats Section - Below Chart */}
         <div className="w-full mt-8 flex justify-center">
-          <div className="bg-zinc-900 p-4 rounded-lg shadow-md w-full max-w-2xl space-y-4">
-            <h2 className="text-xl font-semibold">Developer Stats</h2>
-            <div className="space-y-3">
+          <div className="bg-zinc-900 p-6 rounded-lg shadow-md w-full max-w-4xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold">Developer Stats</h2>
+              <button
+                className="text-gray-400 hover:text-white transition-colors p-2"
+                onMouseEnter={() => setShowHelp("tokens")}
+                onMouseLeave={() => setShowHelp(null)}
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
               {/* Total Commits Card */}
-              <div className="bg-zinc-700 p-4 rounded-lg">
+              <div className="bg-zinc-800 p-6 rounded-lg border border-zinc-700 hover:border-zinc-600 transition-colors">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-zinc-800 rounded-lg">
+                  <div className="p-3 bg-zinc-700 rounded-lg">
                     {/* Branch/Commit Icon */}
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                       <circle cx="7" cy="7" r="3" fill="#0ea5e9" />
@@ -466,15 +562,17 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <p className="text-md text-gray-400">Total Commits</p>
-                    <p className="text-2xl font-semibold">{totalCommits}</p>
+                    <p className="text-3xl font-bold text-white">
+                      {totalCommits}
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Tokens Held Card */}
-              <div className="bg-zinc-700 p-4 rounded-lg">
+              <div className="bg-zinc-800 p-6 rounded-lg border border-zinc-700 hover:border-zinc-600 transition-colors">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-zinc-800 rounded-lg">
+                  <div className="p-3 bg-zinc-700 rounded-lg">
                     {/* Coin/Token Icon */}
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                       <circle
@@ -503,15 +601,17 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <p className="text-md text-gray-400">Tokens Held</p>
-                    <p className="text-2xl font-semibold">{tokensHeld}</p>
+                    <p className="text-3xl font-bold text-white">
+                      {tokensHeld}
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Tokens Claimed Card */}
-              <div className="bg-zinc-700 p-4 rounded-lg">
+              <div className="bg-zinc-800 p-6 rounded-lg border border-zinc-700 hover:border-zinc-600 transition-colors">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-zinc-800 rounded-lg">
+                  <div className="p-3 bg-zinc-700 rounded-lg">
                     {/* Claim/Checkmark Token Icon */}
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                       <circle
@@ -541,20 +641,56 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <p className="text-md text-gray-400">Tokens Claimed</p>
-                    <p className="text-2xl font-semibold">{tokensClaimed}</p>
+                    <p className="text-3xl font-bold text-white">
+                      {tokensClaimed}
+                    </p>
                   </div>
-                  <button
-                    className="ml-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-md disabled:opacity-50"
-                    onClick={handleClaimTokens}
-                    disabled={!tokensHeld}
-                  >
-                    Claim All
-                  </button>
                 </div>
+                <button
+                  className="w-full mt-4 px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 rounded-md text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
+                  onClick={handleClaimTokens}
+                  disabled={!tokensHeld || !publicKey}
+                >
+                  {!publicKey ? "Connect Wallet to Claim" : "Claim All Tokens"}
+                </button>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Help Tooltips */}
+        {showHelp && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-zinc-800 border border-zinc-600 rounded-lg p-6 max-w-md mx-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-white">
+                  Help & Tips
+                </h3>
+                <button
+                  onClick={() => setShowHelp(null)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                {helpContent[showHelp as keyof typeof helpContent]}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
