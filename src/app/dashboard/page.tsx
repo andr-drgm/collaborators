@@ -225,450 +225,110 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
-      <div className="flex justify-between items-start mb-6">
-        <div className="flex items-center gap-4">
-          {/* Wrap title and button */}
-          <button
-            className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm transition-colors"
-            onClick={handleLogout}
-          >
-            &larr; Log Out {/* Left arrow */}
-          </button>
-          <h1 className="text-4xl">Dashboard</h1>
-        </div>
-        {/* Use the new WalletConnect component */}
-        <WalletConnect />
+    <div className="min-h-screen bg-black text-white p-8 relative overflow-hidden">
+      {/* Background gradient elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 left-20 w-48 h-48 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-full blur-3xl"></div>
       </div>
 
-      {/* Onboarding Banner */}
-      {!publicKey && (
-        <div className="mb-8 p-4 bg-gradient-to-r from-blue-900/50 to-cyan-900/50 border border-blue-500/30 rounded-lg">
-          <div className="flex items-center gap-3">
-            <svg
-              className="w-6 h-6 text-blue-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <div>
-              <h3 className="font-semibold text-blue-200">
-                Connect Your Wallet to Start Earning
-              </h3>
-              <p className="text-blue-300 text-sm">
-                Link your Solana wallet to claim SOL tokens for your GitHub
-                contributions
-              </p>
-            </div>
+      <div className="relative z-10">
+        <div className="flex justify-between items-start mb-8">
+          <div className="flex items-center gap-4">
             <button
-              className="ml-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-sm transition-colors"
-              onClick={() => setShowHelp("wallet")}
+              className="btn-secondary px-4 py-2 text-sm"
+              onClick={handleLogout}
             >
-              Need Help?
+              &larr; Log Out
             </button>
+            <h1 className="text-5xl font-bold gradient-text">Dashboard</h1>
           </div>
+          <WalletConnect />
         </div>
-      )}
 
-      {/* Use the new ProfileCard component */}
-      <ProfileCard
-        imageUrl={session?.user?.image}
-        name={session?.user?.name}
-        username={session?.user.tokens.toString()}
-        memberSince={
-          session?.user?.createdAt
-            ? new Date(session.user.createdAt).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })
-            : ""
-        }
-        className="mb-10"
-      />
-
-      {/* Main Grid */}
-      <div>
-        {/* Loading Overlay */}
-        {loading && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-95">
-            <div className="flex flex-col items-center">
-              {/* Dual Ring Spinner */}
-              <div className="mb-4">
-                <div className="w-12 h-12 border-4 border-blue-400 border-t-transparent border-b-transparent rounded-full animate-spin"></div>
+        {/* Onboarding Banner with liquid glass */}
+        {!publicKey && (
+          <div className="mb-10 liquid-glass rounded-2xl p-6 transition-all duration-500 hover:liquid-glass-hover">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center">
+                <svg
+                  className="w-6 h-6 text-blue-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
               </div>
-              <span className="text-lg text-blue-200 font-semibold">
-                Loading dashboard...
-              </span>
+              <div className="flex-1">
+                <h3 className="font-semibold text-blue-200 text-lg">
+                  Connect Your Wallet to Start Earning
+                </h3>
+                <p className="text-blue-300 text-sm">
+                  Link your Solana wallet to claim SOL tokens for your GitHub
+                  contributions
+                </p>
+              </div>
+              <button
+                className="btn-primary px-6 py-3 text-sm"
+                onClick={() => setShowHelp("wallet")}
+              >
+                Need Help?
+              </button>
             </div>
           </div>
         )}
 
-        {/* Chart Section - Full Width, GitHub-style, no scroll */}
-        <div className="w-full flex flex-col items-center">
-          <div className="relative w-full max-w-7xl">
-            {/* Chart Header with Help */}
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-white">
-                Contribution Activity
-              </h2>
-              <button
-                className="text-gray-400 hover:text-white transition-colors p-2"
-                onMouseEnter={() => setShowHelp("commits")}
-                onMouseLeave={() => setShowHelp(null)}
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </button>
-            </div>
+        {/* Profile Card */}
+        <ProfileCard
+          imageUrl={session?.user?.image}
+          name={session?.user?.name}
+          username={session?.user.tokens.toString()}
+          memberSince={
+            session?.user?.createdAt
+              ? new Date(session.user.createdAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })
+              : ""
+          }
+          className="mb-12"
+        />
 
-            {/* Month Labels */}
-            <div className="flex pl-12 pr-2 mb-1 text-xs text-gray-400 font-medium select-none w-full">
-              {(() => {
-                // Calculate the week index for each month start
-                const year = new Date().getFullYear();
-                const weeks: {
-                  month: string;
-                  weekIndex: number;
-                }[] = [];
-                for (let m = 0; m < 12; m++) {
-                  const firstDayOfMonth = new Date(year, m, 1);
-                  const startOfYear = new Date(year, 0, 1);
-                  // Calculate week index (Monday as first day)
-                  const dayOffset =
-                    startOfYear.getDay() === 0 ? 6 : startOfYear.getDay() - 1;
-                  const daysSinceYearStart = Math.floor(
-                    (firstDayOfMonth.getTime() - startOfYear.getTime()) /
-                      (1000 * 60 * 60 * 24)
-                  );
-                  const weekIndex = Math.floor(
-                    (daysSinceYearStart + dayOffset) / 7
-                  );
-                  weeks.push({
-                    month: firstDayOfMonth.toLocaleString("en-US", {
-                      month: "short",
-                    }),
-                    weekIndex,
-                  });
-                }
-                // Render month labels with correct spacing
-                return weeks.map((w, i) => {
-                  const nextWeek = weeks[i + 1]?.weekIndex ?? 53;
-                  const colSpan = nextWeek - w.weekIndex;
-                  return (
-                    <div
-                      key={w.month}
-                      className="text-center"
-                      style={{
-                        minWidth: `calc(${colSpan} * 1fr)`,
-                        flex: colSpan,
-                      }}
-                    >
-                      {w.month}
-                    </div>
-                  );
-                });
-              })()}
-            </div>
-            <div className="flex">
-              {/* Weekday Labels */}
-              <div className="flex flex-col mr-2 text-xs text-gray-400 font-medium select-none">
-                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
-                  <div
-                    key={d}
-                    className="h-[24px] flex items-center justify-center"
-                    style={{
-                      lineHeight: "24px",
-                      height: "28px",
-                    }}
-                  >
-                    {d}
-                  </div>
-                ))}
-              </div>
-              {/* Contribution Grid */}
-              <div className="flex-1">
-                <div
-                  className="relative grid grid-flow-col gap-[4px] w-full"
-                  style={{
-                    gridTemplateRows: "repeat(7, 1fr)",
-                    gridTemplateColumns: "repeat(53, 1fr)",
-                    height: "168px",
-                  }}
-                >
-                  {Array.from({ length: 53 }).map((_, weekIndex) =>
-                    Array.from({ length: 7 }).map((_, dayIndex) => {
-                      // Calculate the date for this cell
-                      const year = new Date().getFullYear();
-                      const startOfYear = new Date(year, 0, 1);
-                      const dayOffset =
-                        startOfYear.getDay() === 0
-                          ? 6
-                          : startOfYear.getDay() - 1;
-                      const cellDate = new Date(startOfYear);
-                      cellDate.setDate(
-                        cellDate.getDate() -
-                          dayOffset +
-                          weekIndex * 7 +
-                          dayIndex
-                      );
-
-                      // --- USE commitData INSTEAD OF mockCommitData ---
-                      const dayData = commitData.find(
-                        (d) =>
-                          d.date.getFullYear() === cellDate.getFullYear() &&
-                          d.date.getMonth() === cellDate.getMonth() &&
-                          d.date.getDate() === cellDate.getDate()
-                      );
-                      const count = dayData ? dayData.count : 0;
-
-                      return (
-                        <div
-                          key={weekIndex + "-" + dayIndex}
-                          className="rounded-[3px] cursor-pointer relative transition-all duration-200"
-                          style={{
-                            backgroundColor: colors[Math.min(count, 4)],
-                            width: "100%",
-                            height: "24px",
-                            opacity:
-                              hoveredWeek === null
-                                ? count === 0
-                                  ? 0.4
-                                  : 1
-                                : weekIndex === hoveredWeek
-                                ? 1
-                                : 0.4,
-                          }}
-                          onMouseEnter={() => {
-                            setActiveIndex(weekIndex * 7 + dayIndex);
-                            setHoveredWeek(weekIndex);
-                          }}
-                          onMouseLeave={() => {
-                            setActiveIndex(null);
-                            setHoveredWeek(null);
-                          }}
-                        >
-                          {activeIndex === weekIndex * 7 + dayIndex && (
-                            <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-gray-800 p-2 rounded text-xs text-gray-100 border border-gray-600 z-30 min-w-[140px]">
-                              <div className="font-medium">{count} commits</div>
-                              <div className="text-gray-400">
-                                {cellDate.toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                })}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })
-                  )}
-                  {/* Week highlight */}
-                  {hoveredWeek !== null && (
-                    <div
-                      className="absolute top-0 pointer-events-none"
-                      style={{
-                        left: `calc(${hoveredWeek} * (100% / 53))`,
-                        width: `calc(100% / 53)`,
-                        height: "calc(100% + 24px)",
-                        border: "2px solid #38bdf8",
-                        borderRadius: "6px",
-                        boxShadow: "0 0 8px #38bdf8aa",
-                        zIndex: 10,
-                      }}
-                    />
-                  )}
+        {/* Main Grid */}
+        <div>
+          {/* Loading Overlay */}
+          {loading && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm">
+              <div className="liquid-glass rounded-3xl p-12 flex flex-col items-center">
+                <div className="mb-6">
+                  <div className="w-16 h-16 border-4 border-blue-400 border-t-transparent border-b-transparent rounded-full animate-spin"></div>
                 </div>
+                <span className="text-xl text-blue-200 font-semibold">
+                  Loading dashboard...
+                </span>
               </div>
             </div>
-            {/* Legend */}
-            <div className="flex items-center justify-center gap-2 text-xs mt-8 w-full">
-              <span className="text-gray-400">Less</span>
-              <div className="flex items-center gap-1">
-                {colors.map((color, i) => (
-                  <div
-                    key={i}
-                    className="w-4 h-4 rounded-[2px]"
-                    style={{ backgroundColor: color }}
-                  />
-                ))}
-              </div>
-              <span className="text-gray-400">More</span>
-            </div>
-          </div>
-        </div>
+          )}
 
-        {/* Stats Section - Below Chart */}
-        <div className="w-full mt-8 flex justify-center">
-          <div className="bg-zinc-900 p-6 rounded-lg shadow-md w-full max-w-4xl">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">Developer Stats</h2>
-              <button
-                className="text-gray-400 hover:text-white transition-colors p-2"
-                onMouseEnter={() => setShowHelp("tokens")}
-                onMouseLeave={() => setShowHelp(null)}
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {/* Total Commits Card */}
-              <div className="bg-zinc-800 p-6 rounded-lg border border-zinc-700 hover:border-zinc-600 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-zinc-700 rounded-lg">
-                    {/* Branch/Commit Icon */}
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                      <circle cx="7" cy="7" r="3" fill="#0ea5e9" />
-                      <circle cx="17" cy="17" r="3" fill="#0369a1" />
-                      <path
-                        d="M7 10v2a5 5 0 0 0 5 5h2"
-                        stroke="#7dd3fc"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-md text-gray-400">Total Commits</p>
-                    <p className="text-3xl font-bold text-white">
-                      {totalCommits}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tokens Held Card */}
-              <div className="bg-zinc-800 p-6 rounded-lg border border-zinc-700 hover:border-zinc-600 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-zinc-700 rounded-lg">
-                    {/* Coin/Token Icon */}
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="9"
-                        fill="#7dd3fc"
-                        stroke="#0369a1"
-                        strokeWidth="2"
-                      />
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="5"
-                        fill="#38bdf8"
-                        stroke="#0ea5e9"
-                        strokeWidth="2"
-                      />
-                      <path
-                        d="M12 7v2M12 15v2M7 12h2M15 12h2"
-                        stroke="#0369a1"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-md text-gray-400">Tokens Held</p>
-                    <p className="text-3xl font-bold text-white">
-                      {tokensHeld}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tokens Claimed Card */}
-              <div className="bg-zinc-800 p-6 rounded-lg border border-zinc-700 hover:border-zinc-600 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-zinc-700 rounded-lg">
-                    {/* Claim/Checkmark Token Icon */}
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="9"
-                        fill="#ebf6ff"
-                        stroke="#38bdf8"
-                        strokeWidth="2"
-                      />
-                      <path
-                        d="M9 12l2 2 4-4"
-                        stroke="#0ea5e9"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="5"
-                        fill="none"
-                        stroke="#7dd3fc"
-                        strokeWidth="1.5"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-md text-gray-400">Tokens Claimed</p>
-                    <p className="text-3xl font-bold text-white">
-                      {tokensClaimed}
-                    </p>
-                  </div>
-                </div>
+          {/* Chart Section - Full Width, GitHub-style, no scroll */}
+          <div className="w-full flex flex-col items-center mb-12">
+            <div className="relative w-full max-w-7xl">
+              {/* Chart Header with Help */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-3xl font-bold gradient-text">
+                  Contribution Activity
+                </h2>
                 <button
-                  className="w-full mt-4 px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 rounded-md text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
-                  onClick={handleClaimTokens}
-                  disabled={!tokensHeld || !publicKey}
-                >
-                  {!publicKey ? "Connect Wallet to Claim" : "Claim All Tokens"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Help Tooltips */}
-        {showHelp && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-zinc-800 border border-zinc-600 rounded-lg p-6 max-w-md mx-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-white">
-                  Help & Tips
-                </h3>
-                <button
-                  onClick={() => setShowHelp(null)}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-white/60 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
+                  onMouseEnter={() => setShowHelp("commits")}
+                  onMouseLeave={() => setShowHelp(null)}
                 >
                   <svg
                     className="w-6 h-6"
@@ -680,17 +340,395 @@ export default function Dashboard() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="2"
-                      d="M6 18L18 6M6 6l12 12"
+                      d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
                 </button>
               </div>
-              <p className="text-gray-300 text-sm leading-relaxed">
-                {helpContent[showHelp as keyof typeof helpContent]}
-              </p>
+
+              {/* Chart Container with liquid glass */}
+              <div className="liquid-glass rounded-3xl p-8 transition-all duration-500 hover:liquid-glass-hover">
+                {/* Month Labels */}
+                <div className="flex pl-12 pr-2 mb-3 text-sm text-white/60 font-medium select-none w-full">
+                  {(() => {
+                    // Calculate the week index for each month start
+                    const year = new Date().getFullYear();
+                    const weeks: {
+                      month: string;
+                      weekIndex: number;
+                    }[] = [];
+                    for (let m = 0; m < 12; m++) {
+                      const firstDayOfMonth = new Date(year, m, 1);
+                      const startOfYear = new Date(year, 0, 1);
+                      // Calculate week index (Monday as first day)
+                      const dayOffset =
+                        startOfYear.getDay() === 0
+                          ? 6
+                          : startOfYear.getDay() - 1;
+                      const daysSinceYearStart = Math.floor(
+                        (firstDayOfMonth.getTime() - startOfYear.getTime()) /
+                          (1000 * 60 * 60 * 24)
+                      );
+                      const weekIndex = Math.floor(
+                        (daysSinceYearStart + dayOffset) / 7
+                      );
+                      weeks.push({
+                        month: firstDayOfMonth.toLocaleString("en-US", {
+                          month: "short",
+                        }),
+                        weekIndex,
+                      });
+                    }
+                    // Render month labels with correct spacing
+                    return weeks.map((w, i) => {
+                      const nextWeek = weeks[i + 1]?.weekIndex ?? 53;
+                      const colSpan = nextWeek - w.weekIndex;
+                      return (
+                        <div
+                          key={w.month}
+                          className="text-center"
+                          style={{
+                            minWidth: `calc(${colSpan} * 1fr)`,
+                            flex: colSpan,
+                          }}
+                        >
+                          {w.month}
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+                <div className="flex">
+                  {/* Weekday Labels */}
+                  <div className="flex flex-col mr-3 text-sm text-white/60 font-medium select-none">
+                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                      (d) => (
+                        <div
+                          key={d}
+                          className="h-[24px] flex items-center justify-center"
+                          style={{
+                            lineHeight: "24px",
+                            height: "28px",
+                          }}
+                        >
+                          {d}
+                        </div>
+                      )
+                    )}
+                  </div>
+                  {/* Contribution Grid */}
+                  <div className="flex-1">
+                    <div
+                      className="relative grid grid-flow-col gap-[4px] w-full"
+                      style={{
+                        gridTemplateRows: "repeat(7, 1fr)",
+                        gridTemplateColumns: "repeat(53, 1fr)",
+                        height: "168px",
+                      }}
+                    >
+                      {Array.from({ length: 53 }).map((_, weekIndex) =>
+                        Array.from({ length: 7 }).map((_, dayIndex) => {
+                          // Calculate the date for this cell
+                          const year = new Date().getFullYear();
+                          const startOfYear = new Date(year, 0, 1);
+                          const dayOffset =
+                            startOfYear.getDay() === 0
+                              ? 6
+                              : startOfYear.getDay() - 1;
+                          const cellDate = new Date(startOfYear);
+                          cellDate.setDate(
+                            cellDate.getDate() -
+                              dayOffset +
+                              weekIndex * 7 +
+                              dayIndex
+                          );
+
+                          // --- USE commitData INSTEAD OF mockCommitData ---
+                          const dayData = commitData.find(
+                            (d) =>
+                              d.date.getFullYear() === cellDate.getFullYear() &&
+                              d.date.getMonth() === cellDate.getMonth() &&
+                              d.date.getDate() === cellDate.getDate()
+                          );
+                          const count = dayData ? dayData.count : 0;
+
+                          return (
+                            <div
+                              key={weekIndex + "-" + dayIndex}
+                              className="rounded-[3px] cursor-pointer relative transition-all duration-200"
+                              style={{
+                                backgroundColor: colors[Math.min(count, 4)],
+                                width: "100%",
+                                height: "24px",
+                                opacity:
+                                  hoveredWeek === null
+                                    ? count === 0
+                                      ? 0.4
+                                      : 1
+                                    : weekIndex === hoveredWeek
+                                    ? 1
+                                    : 0.4,
+                              }}
+                              onMouseEnter={() => {
+                                setActiveIndex(weekIndex * 7 + dayIndex);
+                                setHoveredWeek(weekIndex);
+                              }}
+                              onMouseLeave={() => {
+                                setActiveIndex(null);
+                                setHoveredWeek(null);
+                              }}
+                            >
+                              {activeIndex === weekIndex * 7 + dayIndex && (
+                                <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 liquid-glass p-4 rounded-xl text-sm text-white border border-white/20 z-30 min-w-[160px] shadow-2xl">
+                                  <div className="font-semibold text-lg">
+                                    {count} commits
+                                  </div>
+                                  <div className="text-white/70">
+                                    {cellDate.toLocaleDateString("en-US", {
+                                      month: "short",
+                                      day: "numeric",
+                                      year: "numeric",
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })
+                      )}
+                      {/* Week highlight */}
+                      {hoveredWeek !== null && (
+                        <div
+                          className="absolute top-0 pointer-events-none"
+                          style={{
+                            left: `calc(${hoveredWeek} * (100% / 53))`,
+                            width: `calc(100% / 53)`,
+                            height: "calc(100% + 24px)",
+                            border: "2px solid #38bdf8",
+                            borderRadius: "8px",
+                            boxShadow: "0 0 16px #38bdf8aa",
+                            zIndex: 10,
+                          }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {/* Legend */}
+                <div className="flex items-center justify-center gap-3 text-sm mt-8 w-full">
+                  <span className="text-white/60">Less</span>
+                  <div className="flex items-center gap-1">
+                    {colors.map((color, i) => (
+                      <div
+                        key={i}
+                        className="w-5 h-5 rounded-[3px]"
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-white/60">More</span>
+                </div>
+              </div>
             </div>
           </div>
-        )}
+
+          {/* Stats Section - Below Chart */}
+          <div className="w-full flex justify-center">
+            <div className="liquid-glass p-8 rounded-3xl shadow-2xl w-full max-w-5xl transition-all duration-500 hover:liquid-glass-hover">
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-semibold gradient-text">
+                  Developer Stats
+                </h2>
+                <button
+                  className="text-white/60 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
+                  onMouseEnter={() => setShowHelp("tokens")}
+                  onMouseLeave={() => setShowHelp(null)}
+                >
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8">
+                {/* Total Commits Card */}
+                <div className="glass-card p-8 rounded-2xl border border-white/10 hover:glass-card-hover transition-all duration-500 group">
+                  <div className="flex items-center gap-5">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <circle cx="7" cy="7" r="3" fill="#0ea5e9" />
+                        <circle cx="17" cy="17" r="3" fill="#0369a1" />
+                        <path
+                          d="M7 10v2a5 5 0 0 0 5 5h2"
+                          stroke="#7dd3fc"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-lg text-white/70 font-medium">
+                        Total Commits
+                      </p>
+                      <p className="text-4xl font-bold text-white">
+                        {totalCommits}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tokens Held Card */}
+                <div className="glass-card p-8 rounded-2xl border border-white/10 hover:glass-card-hover transition-all duration-500 group">
+                  <div className="flex items-center gap-5">
+                    <div className="w-16 h-16 bg-gradient-to-br from-cyan-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="9"
+                          fill="#7dd3fc"
+                          stroke="#0369a1"
+                          strokeWidth="2"
+                        />
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="5"
+                          fill="#38bdf8"
+                          stroke="#0ea5e9"
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M12 7v2M12 15v2M7 12h2M15 12h2"
+                          stroke="#0369a1"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-lg text-white/70 font-medium">
+                        Tokens Held
+                      </p>
+                      <p className="text-4xl font-bold text-white">
+                        {tokensHeld}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tokens Claimed Card */}
+                <div className="glass-card p-8 rounded-2xl border border-white/10 hover:glass-card-hover transition-all duration-500 group">
+                  <div className="flex items-center gap-5">
+                    <div className="w-16 h-16 bg-gradient-to-br from-teal-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="9"
+                          fill="#ebf6ff"
+                          stroke="#38bdf8"
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M9 12l2 2 4-4"
+                          stroke="#0ea5e9"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="5"
+                          fill="none"
+                          stroke="#7dd3fc"
+                          strokeWidth="1.5"
+                        />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-lg text-white/70 font-medium">
+                        Tokens Claimed
+                      </p>
+                      <p className="text-4xl font-bold text-white">
+                        {tokensClaimed}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    className="w-full mt-6 btn-primary py-4 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                    onClick={handleClaimTokens}
+                    disabled={!tokensHeld || !publicKey}
+                  >
+                    {!publicKey
+                      ? "Connect Wallet to Claim"
+                      : "Claim All Tokens"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Help Tooltips */}
+          {showHelp && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+              <div className="liquid-glass border border-white/20 rounded-2xl p-8 max-w-md mx-4 shadow-2xl">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold text-white gradient-text">
+                    Help & Tips
+                  </h3>
+                  <button
+                    onClick={() => setShowHelp(null)}
+                    className="text-white/60 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <p className="text-white/80 text-base leading-relaxed">
+                  {helpContent[showHelp as keyof typeof helpContent]}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
