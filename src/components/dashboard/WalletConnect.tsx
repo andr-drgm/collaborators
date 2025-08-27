@@ -30,16 +30,14 @@ export default function WalletConnect({ className = "" }: WalletConnectProps) {
     <div className={`flex items-center gap-4 ${className}`}>
       {!publicKey ? (
         <div className="relative">
-          <WalletMultiButton
-            className="!bg-gradient-to-r !from-blue-600 !to-cyan-600 hover:!from-blue-700 hover:!to-cyan-700 !rounded-md !px-4 !py-2 !text-sm !font-medium !shadow-lg hover:!shadow-blue-500/25" // Add Tailwind classes
-          />
+          <WalletMultiButton className="!bg-gradient-to-r !from-blue-600 !to-cyan-600 hover:!from-blue-700 hover:!to-cyan-700 !rounded-xl !px-6 !py-3 !text-sm !font-semibold !shadow-lg hover:!shadow-blue-500/25 !transition-all !duration-300 hover:!scale-105" />
           <button
-            className="ml-2 text-gray-400 hover:text-white transition-colors p-1"
+            className="ml-3 text-white/60 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
             onMouseEnter={() => setShowWalletHelp(true)}
             onMouseLeave={() => setShowWalletHelp(false)}
           >
             <svg
-              className="w-4 h-4"
+              className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -53,22 +51,22 @@ export default function WalletConnect({ className = "" }: WalletConnectProps) {
             </svg>
           </button>
 
-          {/* Wallet Help Tooltip */}
+          {/* Wallet Help Tooltip with liquid glass */}
           {showWalletHelp && (
-            <div className="absolute right-0 top-full mt-2 bg-zinc-800 border border-zinc-600 rounded-lg p-4 text-sm text-white max-w-xs z-50 shadow-xl">
-              <h4 className="font-semibold text-blue-200 mb-2">
+            <div className="absolute right-0 top-full mt-3 liquid-glass rounded-2xl p-6 text-sm text-white max-w-xs z-50 shadow-2xl border border-white/20">
+              <h4 className="font-semibold text-blue-200 mb-3 text-base">
                 Need a Solana Wallet?
               </h4>
-              <p className="text-gray-300 mb-3">
+              <p className="text-white/80 mb-4 leading-relaxed">
                 We recommend Phantom or Solflare. Make sure you have some SOL
                 for transaction fees.
               </p>
-              <div className="space-y-2 text-xs">
+              <div className="space-y-3 text-sm">
                 <a
                   href="https://phantom.app"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block text-blue-400 hover:text-blue-300 transition-colors"
+                  className="block text-blue-400 hover:text-blue-300 transition-colors font-medium"
                 >
                   → Get Phantom Wallet
                 </a>
@@ -76,26 +74,24 @@ export default function WalletConnect({ className = "" }: WalletConnectProps) {
                   href="https://solflare.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block text-blue-400 hover:text-blue-300 transition-colors"
+                  className="block text-blue-400 hover:text-blue-300 transition-colors font-medium"
                 >
                   → Get Solflare Wallet
                 </a>
               </div>
-              <div className="absolute top-0 right-4 transform -translate-y-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-zinc-800"></div>
+              <div className="absolute top-0 right-6 transform -translate-y-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-white/20"></div>
             </div>
           )}
         </div>
       ) : (
         <>
-          <div className="flex items-center gap-2 bg-gradient-to-r from-green-900/50 to-emerald-900/50 border border-green-500/30 px-3 py-1.5 rounded-lg">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-sm font-mono text-green-200">
+          <div className="flex items-center gap-3 liquid-glass rounded-xl px-4 py-2 border border-white/20">
+            <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
+            <span className="text-sm font-mono text-white/90 font-medium">
               {shortenAddress(publicKey.toBase58())}
             </span>
           </div>
-          <WalletDisconnectButton
-            className="!bg-red-600 hover:!bg-red-700 !rounded-md !px-4 !py-2 !text-sm !font-medium" // Consistent styling
-          />
+          <WalletDisconnectButton className="!bg-gradient-to-r !from-red-600 !to-pink-600 hover:!from-red-700 hover:!to-pink-700 !rounded-xl !px-6 !py-3 !text-sm !font-semibold !shadow-lg hover:!shadow-red-500/25 !transition-all !duration-300 hover:!scale-105" />
         </>
       )}
     </div>

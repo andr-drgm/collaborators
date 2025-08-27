@@ -5,87 +5,102 @@ import Image from "next/image";
 
 export default function HeroSection() {
   return (
-    <section className="min-h-screen flex flex-col items-center justify-center relative">
-      <div
-        className="absolute top-10 left-10 w-16 h-16 border-t-2 border-l-2 border-cyan-400 rounded-tl-xl"
-        style={{ opacity: 1, transform: "none" }}
-      ></div>
-      <div
-        className="absolute top-10 right-10 w-16 h-16 border-t-2 border-r-2 border-teal-400 rounded-tr-xl"
-        style={{ opacity: 1, transform: "none" }}
-      ></div>
-      <div
-        className="absolute bottom-10 left-10 w-16 h-16 border-b-2 border-l-2 border-teal-400 rounded-bl-xl"
-        style={{ opacity: 1, transform: "none" }}
-      ></div>
-      <div
-        className="absolute bottom-10 right-10 w-16 h-16 border-b-2 border-r-2 border-cyan-400 rounded-br-xl"
-        style={{ opacity: 1, transform: "none" }}
-      ></div>
-      <div className="container max-w-md px-4 z-10">
+    <section className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl animate-float"></div>
         <div
-          className="flex flex-col items-center space-y-8"
-          style={{ opacity: 1, transform: "none" }}
-        >
-          <div
-            className="relative w-40 h-40"
-            style={{ transform: "translateY(-1.0619px) scale(1)" }}
-          >
-            <Image
-              width={100}
-              height={100}
-              alt="Collab0rators Logo"
-              decoding="async"
-              data-nimg="fill"
-              className="object-contain"
-              style={{
-                position: "absolute",
-                height: "100%",
-                width: "100%",
-                left: 0,
-                top: 0,
-                right: 0,
-                bottom: 0,
-              }}
-              // Corrected path to logo in public folder
-              src="/logo.png"
-            />
+          className="absolute top-40 right-32 w-24 h-24 bg-gradient-to-br from-teal-500/20 to-purple-500/20 rounded-full blur-3xl animate-float"
+          style={{ animationDelay: "2s" }}
+        ></div>
+        <div
+          className="absolute bottom-32 left-32 w-28 h-28 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full blur-3xl animate-float"
+          style={{ animationDelay: "4s" }}
+        ></div>
+      </div>
+
+      {/* Corner accents with refined styling */}
+      <div className="absolute top-10 left-10 w-16 h-16 border-t-2 border-l-2 border-blue-400/60 rounded-tl-xl"></div>
+      <div className="absolute top-10 right-10 w-16 h-16 border-t-2 border-r-2 border-cyan-400/60 rounded-tr-xl"></div>
+      <div className="absolute bottom-10 left-10 w-16 h-16 border-b-2 border-l-2 border-teal-400/60 rounded-bl-xl"></div>
+      <div className="absolute bottom-10 right-10 w-16 h-16 border-b-2 border-r-2 border-blue-400/60 rounded-br-xl"></div>
+
+      <div className="container max-w-md px-4 z-10">
+        <div className="flex flex-col items-center space-y-8">
+          {/* Logo with enhanced styling */}
+          <div className="relative w-40 h-40 animate-float">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-2xl"></div>
+            <div className="relative w-full h-full">
+              <Image
+                width={100}
+                height={100}
+                alt="Collab0rators Logo"
+                decoding="async"
+                data-nimg="fill"
+                className="object-contain relative z-10"
+                style={{
+                  position: "absolute",
+                  height: "100%",
+                  width: "100%",
+                  left: 0,
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                }}
+                src="/logo.png"
+              />
+            </div>
           </div>
-          <h1 className="text-4xl font-bold text-cyan-600 tracking-tight bg-linear-to-r from-cyan-400 to-teal-400 bg-clip-text">
+
+          {/* Title with gradient text */}
+          <h1 className="text-5xl font-bold tracking-tight gradient-text">
             Collab0rators
           </h1>
-          {/* Clear Steps */}
-          <div className="bg-zinc-900/50 backdrop-blur-sm border border-zinc-700 rounded-xl p-6 max-w-2xl w-full">
-            <h3 className="text-lg font-semibold text-white mb-4 text-center">
+
+          {/* Subtitle */}
+          <p className="text-xl text-center text-white/80 max-w-md leading-relaxed">
+            Transform your open source contributions into on-chain rewards and
+            reputation
+          </p>
+
+          {/* Steps card with liquid glass effect */}
+          <div className="liquid-glass rounded-2xl p-8 max-w-2xl w-full transition-all duration-500 hover:liquid-glass-hover">
+            <h3 className="text-xl font-semibold text-white mb-6 text-center">
               Get Started in 3 Simple Steps
             </h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full bg-cyan-400 text-black text-sm font-bold flex items-center justify-center">
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/10">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-bold flex items-center justify-center shadow-lg">
                   1
                 </div>
-                <span className="text-gray-300">Log in with GitHub</span>
+                <span className="text-white/90 font-medium">
+                  Log in with GitHub
+                </span>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full bg-teal-400 text-black text-sm font-bold flex items-center justify-center">
+              <div className="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/10">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-teal-500 text-white text-sm font-bold flex items-center justify-center shadow-lg">
                   2
                 </div>
-                <span className="text-gray-300">Link your Solana wallet</span>
+                <span className="text-white/90 font-medium">
+                  Link your Solana wallet
+                </span>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full bg-cyan-400 text-black text-sm font-bold flex items-center justify-center">
+              <div className="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/10">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-teal-500 to-purple-500 text-white text-sm font-bold flex items-center justify-center shadow-lg">
                   3
                 </div>
-                <span className="text-gray-300">
+                <span className="text-white/90 font-medium">
                   Start contributing and get rewarded
                 </span>
               </div>
             </div>
           </div>
+
+          {/* CTA Button */}
           <div className="w-full max-w-xs">
             <button
               onClick={() => signIn("github", { redirectTo: "/dashboard" })}
-              className="whitespace-nowrap rounded-md font-medium h-10 px-4 w-full bg-cyan-500 from-cyan-500 to-blue-5000 text-black hover:from-cyan-500 hover:to-teal-500 transition-all duration-300 py-6 text-lg flex items-center justify-center gap-2"
+              className="btn-primary w-full py-4 text-lg flex items-center justify-center gap-3 group"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -97,7 +112,7 @@ export default function HeroSection() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="lucide lucide-github w-5 h-5"
+                className="w-6 h-6 transition-transform group-hover:scale-110"
               >
                 <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
                 <path d="M9 18c-4.51 2-5-2-7-2"></path>
@@ -106,7 +121,8 @@ export default function HeroSection() {
             </button>
           </div>
 
-          <p className="text-gray-400 text-center mt-4" style={{ opacity: 1 }}>
+          {/* Tagline */}
+          <p className="text-white/60 text-center mt-6 text-lg font-medium">
             Collaborate seamlessly. Build together.
           </p>
         </div>

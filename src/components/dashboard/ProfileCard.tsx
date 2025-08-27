@@ -17,35 +17,49 @@ export default function ProfileCard({
 }: ProfileCardProps) {
   return (
     <div className={`flex flex-col items-center ${className}`}>
-      {imageUrl ? (
-        <Image
-          src={imageUrl}
-          alt="Profile"
-          className="w-28 h-28 rounded-full border-4 border-zinc-800 shadow-lg mb-4"
-          width={112}
-          height={112}
-        />
-      ) : (
-        <div className="w-28 h-28 rounded-full bg-zinc-700 animate-pulse border-4 border-zinc-800 shadow-lg mb-4"></div>
-      )}
+      {/* Profile Image with enhanced styling */}
+      <div className="relative mb-6">
+        {imageUrl ? (
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-2xl scale-110"></div>
+            <Image
+              src={imageUrl}
+              alt="Profile"
+              className="relative w-32 h-32 rounded-full border-4 border-white/20 shadow-2xl"
+              width={128}
+              height={128}
+            />
+          </div>
+        ) : (
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-2xl scale-110"></div>
+            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 animate-pulse border-4 border-white/20 shadow-2xl"></div>
+          </div>
+        )}
+      </div>
 
-      {name ? (
-        <div className="text-2xl font-bold">{name}</div>
-      ) : (
-        <div className="h-7 w-48 bg-zinc-700 rounded animate-pulse"></div>
-      )}
+      {/* Profile Info with liquid glass card */}
+      <div className="liquid-glass rounded-2xl p-6 w-full max-w-sm text-center transition-all duration-500 hover:liquid-glass-hover">
+        {name ? (
+          <div className="text-2xl font-bold text-white mb-2">{name}</div>
+        ) : (
+          <div className="h-8 w-48 bg-white/10 rounded-lg animate-pulse mb-2"></div>
+        )}
 
-      {username ? (
-        <div className="text-lg text-gray-300">{username}</div>
-      ) : (
-        <div className="h-6 w-32 bg-zinc-700 rounded animate-pulse mt-1"></div>
-      )}
+        {username ? (
+          <div className="text-lg text-white/80 mb-2">{username}</div>
+        ) : (
+          <div className="h-6 w-32 bg-white/10 rounded-lg animate-pulse mb-2"></div>
+        )}
 
-      {memberSince ? (
-        <div className="text-md text-gray-400 mt-1"> Member since: {memberSince}</div>
-      ) : (
-        <div className="h-5 w-40 bg-zinc-700 rounded animate-pulse mt-1"></div>
-      )}
+        {memberSince ? (
+          <div className="text-sm text-white/60">
+            Member since: {memberSince}
+          </div>
+        ) : (
+          <div className="h-5 w-40 bg-white/10 rounded-lg animate-pulse"></div>
+        )}
+      </div>
     </div>
   );
 }
