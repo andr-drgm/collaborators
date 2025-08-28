@@ -2,12 +2,25 @@
 
 import { signIn } from "next-auth/react";
 import Image from "next/image";
+import RippleGrid from "./ui/RippleGrid";
 
 export default function HeroSection() {
   return (
     <section className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
+        <RippleGrid
+          enableRainbow={true}
+          gridColor="#0a84ff"
+          rippleIntensity={0.05}
+          gridSize={15}
+          gridThickness={35}
+          mouseInteraction={true}
+          mouseInteractionRadius={1.2}
+          opacity={1}
+          vignetteStrength={5}
+          fadeDistance={0.2}
+        />
         <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl animate-float"></div>
         <div
           className="absolute top-40 right-32 w-24 h-24 bg-gradient-to-br from-teal-500/20 to-purple-500/20 rounded-full blur-3xl animate-float"
