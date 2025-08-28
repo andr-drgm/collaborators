@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "./Providers";
 import { SessionProvider } from "next-auth/react";
+import Aurora from "@/components/ui/Aurora";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
