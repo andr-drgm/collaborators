@@ -12,7 +12,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
     "@octokit/core": "^7.0.3",
-    "@prisma/client": "6.12.0",
+    "@prisma/client": "6.15.0",
     "@solana/spl-token": "^0.4.13",
     "@solana/wallet-adapter-base": "^0.9.27",
     "@solana/wallet-adapter-react": "^0.15.39",
@@ -24,7 +24,6 @@
     "next": "15.3.2",
     "next-auth": "5.0.0-beta.29",
     "ogl": "^1.0.11",
-    "prisma": "^6.12.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
@@ -36,7 +35,17 @@
     "@types/react-dom": "^19.1.6",
     "eslint": "^9.31.0",
     "eslint-config-next": "15.3.2",
+    "prisma": "^6.15.0",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.8.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines"
+    ],
+    "ignoredBuiltDependencies": [
+      "prisma"
+    ]
   }
 }
