@@ -11,7 +11,15 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
 
-    const where: any = {};
+    const where: {
+      OR?: Array<{
+        name?: { contains: string; mode: "insensitive" };
+        description?: { contains: string; mode: "insensitive" };
+        owner?: { contains: string; mode: "insensitive" };
+        repo?: { contains: string; mode: "insensitive" };
+      }>;
+      isApproved?: boolean;
+    } = {};
 
     if (search) {
       where.OR = [

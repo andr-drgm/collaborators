@@ -51,7 +51,14 @@ export default function Dashboard() {
     owner: string;
     repo: string;
   } | null>(null);
-  const [userProjects, setUserProjects] = useState<any[]>([]);
+  const [userProjects, setUserProjects] = useState<
+    {
+      id: string;
+      name: string;
+      owner: string;
+      repo: string;
+    }[]
+  >([]);
 
   // --- FETCH USER PROJECTS ---
   useEffect(() => {
@@ -255,7 +262,12 @@ export default function Dashboard() {
     signOut({ redirectTo: "/" });
   };
 
-  const handleProjectSelect = (project: any) => {
+  const handleProjectSelect = (project: {
+    id: string;
+    name: string;
+    owner: string;
+    repo: string;
+  }) => {
     setSelectedProject({
       id: project.id,
       name: project.name,
@@ -659,8 +671,8 @@ export default function Dashboard() {
                   No Projects Assigned
                 </h3>
                 <p className="text-white/70 mb-6">
-                  You haven't been assigned to any projects yet. Discover and
-                  join projects to start tracking your contributions.
+                  You haven&apos;t been assigned to any projects yet. Discover
+                  and join projects to start tracking your contributions.
                 </p>
                 <button
                   onClick={() => setShowProjectModal(true)}

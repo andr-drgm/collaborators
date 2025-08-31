@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 
 interface Project {
@@ -62,7 +62,7 @@ export default function ProjectModal({
   const [submitting, setSubmitting] = useState(false);
 
   // Fetch projects
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -79,7 +79,7 @@ export default function ProjectModal({
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, statusFilter]);
 
   // Fetch user's assigned projects
   const fetchUserProjects = async () => {
@@ -99,7 +99,7 @@ export default function ProjectModal({
       fetchProjects();
       fetchUserProjects();
     }
-  }, [isOpen, searchTerm, statusFilter]);
+  }, [isOpen, fetchProjects]);
 
   // Handle project submission
   const handleSubmit = async (e: React.FormEvent) => {
