@@ -6,14 +6,23 @@ const octokit = new Octokit({
   auth: process.env.GITHUB_ACCESS_TOKEN,
 });
 
-export async function GET() {
+export async function GET(request: Request) {
   const session = await auth();
+  const { searchParams } = new URL(request.url);
+  const owner = searchParams.get("owner");
+  const repo = searchParams.get("repo");
+
+  // Return empty array if no owner/repo provided
+  if (!owner || !repo) {
+    return NextResponse.json([]);
+  }
+
   try {
     const response = await octokit.request(
       "GET /repos/{owner}/{repo}/commits",
       {
-        owner: "andr-drgm",
-        repo: "the-collaborator",
+        owner,
+        repo,
         committer: session?.user.username,
       }
     );

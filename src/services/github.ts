@@ -1,6 +1,17 @@
-export const getCommits = async () => {
+export const getCommits = async (
+  selectedProject?: { owner: string; repo: string } | null
+) => {
+  // Return empty array if no project is selected
+  if (!selectedProject) {
+    return [];
+  }
+
   try {
-    const response = await fetch("/api/github/commits", {
+    const params = new URLSearchParams();
+    params.append("owner", selectedProject.owner);
+    params.append("repo", selectedProject.repo);
+
+    const response = await fetch(`/api/github/commits?${params.toString()}`, {
       next: { revalidate: 300000 }, // 5 min
     });
 
