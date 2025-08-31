@@ -26,6 +26,10 @@ model User {
   // Optional for WebAuthn support
   Authenticator Authenticator[]
 
+  // Project-related relationships
+  votes              Vote[]
+  projectAssignments ProjectAssignment[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -85,4 +89,49 @@ model Authenticator {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, credentialID])
+}
+
+// Project management models
+model Project {
+  id          String  @id @default(cuid())
+  name        String
+  description String
+  githubUrl   String  @unique
+  owner       String // GitHub owner/org
+  repo        String // GitHub repo name
+  isApproved  Boolean @default(false)
+  voteCount   Int     @default(0)
+
+  // Relationships
+  votes              Vote[]
+  projectAssignments ProjectAssignment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Vote {
+  id        String @id @default(cuid())
+  userId    String
+  projectId String
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, projectId]) // One vote per user per project
+}
+
+model ProjectAssignment {
+  id        String @id @default(cuid())
+  userId    String
+  projectId String
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, projectId]) // One assignment per user per project
 }
