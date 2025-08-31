@@ -328,7 +328,6 @@ export default function Dashboard() {
                 <button
                   className="text-white/60 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
                   onMouseEnter={() => setShowHelp("commits")}
-                  onMouseLeave={() => setShowHelp(null)}
                 >
                   <svg
                     className="w-6 h-6"
@@ -542,7 +541,6 @@ export default function Dashboard() {
                 <button
                   className="text-white/60 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
                   onMouseEnter={() => setShowHelp("tokens")}
-                  onMouseLeave={() => setShowHelp(null)}
                 >
                   <svg
                     className="w-6 h-6"
