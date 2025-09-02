@@ -11,14 +11,7 @@ interface Project {
   owner: string;
   repo: string;
   isApproved: boolean;
-  voteCount: number;
-  votes: Array<{
-    id: string;
-    user: {
-      name: string | null;
-      image: string | null;
-    };
-  }>;
+  tweetUrl?: string;
   projectAssignments: Array<{
     id: string;
     user: {
@@ -27,7 +20,6 @@ interface Project {
     };
   }>;
   _count: {
-    votes: number;
     projectAssignments: number;
   };
 }
@@ -58,8 +50,16 @@ export default function ProjectModal({
     name: "",
     description: "",
     githubUrl: "",
+    tweetUrl: "",
   });
   const [submitting, setSubmitting] = useState(false);
+
+  // Tweet approval state
+  const [tweetUrl, setTweetUrl] = useState("");
+  const [submittingTweet, setSubmittingTweet] = useState(false);
+  const [selectedProjectForTweet, setSelectedProjectForTweet] = useState<
+    string | null
+  >(null);
 
   // Fetch projects
   const fetchProjects = useCallback(async () => {
@@ -116,7 +116,12 @@ export default function ProjectModal({
       });
 
       if (response.ok) {
-        setSubmitForm({ name: "", description: "", githubUrl: "" });
+        setSubmitForm({
+          name: "",
+          description: "",
+          githubUrl: "",
+          tweetUrl: "",
+        });
         setActiveTab("discover");
         fetchProjects(); // Refresh the list
       } else {
@@ -131,22 +136,38 @@ export default function ProjectModal({
     }
   };
 
-  // Handle voting
-  const handleVote = async (projectId: string) => {
+  // Handle tweet submission for approval
+  const handleTweetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedProjectForTweet) return;
+
+    setSubmittingTweet(true);
     try {
-      const response = await fetch(`/api/projects/${projectId}/vote`, {
-        method: "POST",
-      });
+      const response = await fetch(
+        `/api/projects/${selectedProjectForTweet}/tweet`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ tweetUrl }),
+        }
+      );
 
       if (response.ok) {
+        setTweetUrl("");
+        setSelectedProjectForTweet(null);
         fetchProjects(); // Refresh the list
+        alert("Project approved! Thank you for sharing on X.");
       } else {
         const error = await response.json();
-        alert(error.error || "Failed to vote");
+        alert(error.error || "Failed to submit X post");
       }
     } catch (error) {
-      console.error("Error voting:", error);
-      alert("Failed to vote");
+      console.error("Error submitting X post:", error);
+      alert("Failed to submit X post");
+    } finally {
+      setSubmittingTweet(false);
     }
   };
 
@@ -169,11 +190,6 @@ export default function ProjectModal({
       console.error("Error assigning to project:", error);
       alert("Failed to assign to project");
     }
-  };
-
-  // Check if user has voted for a project
-  const hasUserVoted = (project: Project) => {
-    return project.votes.some((vote) => vote.user.name === session?.user?.name);
   };
 
   // Check if user is assigned to a project
@@ -300,7 +316,16 @@ export default function ProjectModal({
                               <span>
                                 👥 {project._count.projectAssignments} assigned
                               </span>
-                              <span>👍 {project._count.votes} votes</span>
+                              {project.tweetUrl && (
+                                <a
+                                  href={project.tweetUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                                >
+                                  ✖️ View Post
+                                </a>
+                              )}
                               <a
                                 href={project.githubUrl}
                                 target="_blank"
@@ -368,7 +393,16 @@ export default function ProjectModal({
                               <span>
                                 👥 {project._count.projectAssignments} assigned
                               </span>
-                              <span>👍 {project._count.votes} votes</span>
+                              {project.tweetUrl && (
+                                <a
+                                  href={project.tweetUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                                >
+                                  ✖️ View Post
+                                </a>
+                              )}
                               <a
                                 href={project.githubUrl}
                                 target="_blank"
@@ -380,12 +414,14 @@ export default function ProjectModal({
                             </div>
                           </div>
                           <div className="flex gap-2">
-                            {!hasUserVoted(project) && !project.isApproved && (
+                            {!project.isApproved && (
                               <button
-                                onClick={() => handleVote(project.id)}
+                                onClick={() =>
+                                  setSelectedProjectForTweet(project.id)
+                                }
                                 className="px-4 py-2 bg-green-500/20 text-green-300 border border-green-500/30 rounded-xl hover:bg-green-500/30 transition-all duration-300"
                               >
-                                Vote
+                                Approve with X Post
                               </button>
                             )}
                             {project.isApproved && !isUserAssigned(project) && (
@@ -411,6 +447,53 @@ export default function ProjectModal({
                   </div>
                 )}
               </div>
+
+              {/* Tweet Approval Modal */}
+              {selectedProjectForTweet && (
+                <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+                  <div className="liquid-glass border border-white/20 rounded-2xl p-6 max-w-md w-full mx-4">
+                    <h3 className="text-xl font-bold text-white mb-4">
+                      Approve Project with X Post
+                    </h3>
+                    <p className="text-white/70 mb-4">
+                      To approve this project, please post on X mentioning{" "}
+                      <span className="text-blue-400">@collab0rators</span> and
+                      share the post URL below.
+                    </p>
+                    <form onSubmit={handleTweetSubmit} className="space-y-4">
+                      <input
+                        type="url"
+                        value={tweetUrl}
+                        onChange={(e) => setTweetUrl(e.target.value)}
+                        placeholder="https://x.com/username/status/123456789"
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-blue-500/50"
+                        required
+                      />
+                      <div className="flex gap-3">
+                        <button
+                          type="submit"
+                          disabled={submittingTweet}
+                          className="flex-1 btn-primary py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {submittingTweet
+                            ? "Submitting..."
+                            : "Approve Project"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedProjectForTweet(null);
+                            setTweetUrl("");
+                          }}
+                          className="px-4 py-3 text-white/60 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -464,6 +547,25 @@ export default function ProjectModal({
                   placeholder="https://github.com/owner/repo"
                   required
                 />
+              </div>
+
+              <div>
+                <label className="block text-white/80 font-medium mb-2">
+                  X Post URL (Optional - for immediate approval)
+                </label>
+                <input
+                  type="url"
+                  value={submitForm.tweetUrl}
+                  onChange={(e) =>
+                    setSubmitForm({ ...submitForm, tweetUrl: e.target.value })
+                  }
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-blue-500/50"
+                  placeholder="https://x.com/username/status/123456789"
+                />
+                <p className="text-white/60 text-sm mt-1">
+                  Include an X post mentioning @collab0rators for immediate
+                  approval, or leave empty to submit for later approval.
+                </p>
               </div>
 
               <button
