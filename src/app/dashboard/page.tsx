@@ -9,6 +9,7 @@ import ProjectSelector from "@/components/dashboard/ProjectSelector";
 import LoadingOverlay from "@/components/dashboard/LoadingOverlay";
 import OnboardingBanner from "@/components/dashboard/OnboardingBanner";
 import NoProjectsMessage from "@/components/dashboard/NoProjectsMessage";
+import TweetApprovalInfo from "@/components/dashboard/TweetApprovalInfo";
 import ProjectModal from "@/components/ProjectModal";
 import { useDashboard } from "@/hooks/useDashboard";
 import { formatMemberSince } from "@/utils/dashboardUtils";
@@ -69,6 +70,9 @@ export default function Dashboard() {
 
         {/* Onboarding Banner */}
         <OnboardingBanner onShowHelp={handleShowHelp} />
+
+        {/* Tweet Approval Info */}
+        <TweetApprovalInfo className="mb-8" />
 
         {/* Profile Card */}
         <ProfileCard

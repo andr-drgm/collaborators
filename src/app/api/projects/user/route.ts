@@ -19,7 +19,6 @@ export async function GET() {
           include: {
             _count: {
               select: {
-                votes: true,
                 projectAssignments: true,
               },
             },

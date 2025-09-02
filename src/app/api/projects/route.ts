@@ -40,13 +40,6 @@ export async function GET(request: NextRequest) {
       prisma.project.findMany({
         where,
         include: {
-          votes: {
-            include: {
-              user: {
-                select: { name: true, image: true },
-              },
-            },
-          },
           projectAssignments: {
             include: {
               user: {
@@ -56,16 +49,11 @@ export async function GET(request: NextRequest) {
           },
           _count: {
             select: {
-              votes: true,
               projectAssignments: true,
             },
           },
         },
-        orderBy: [
-          { isApproved: "desc" },
-          { voteCount: "desc" },
-          { createdAt: "desc" },
-        ],
+        orderBy: [{ isApproved: "desc" }, { createdAt: "desc" }],
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -99,7 +87,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, description, githubUrl } = body;
+    const { name, description, githubUrl, tweetUrl } = body;
 
     if (!name || !description || !githubUrl) {
       return NextResponse.json(
@@ -134,6 +122,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate X post URL if provided
+    if (tweetUrl) {
+      const xUrlPattern =
+        /^https:\/\/(twitter\.com|x\.com)\/[^\/]+\/status\/\d+$/;
+      if (!xUrlPattern.test(tweetUrl)) {
+        return NextResponse.json(
+          { error: "Invalid X post URL format" },
+          { status: 400 }
+        );
+      }
+    }
+
     const project = await prisma.project.create({
       data: {
         name,
@@ -141,11 +141,12 @@ export async function POST(request: NextRequest) {
         githubUrl,
         owner,
         repo,
+        tweetUrl,
+        isApproved: !!tweetUrl, // Auto-approve if tweet URL is provided
       },
       include: {
         _count: {
           select: {
-            votes: true,
             projectAssignments: true,
           },
         },
