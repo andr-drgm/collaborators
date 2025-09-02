@@ -457,8 +457,15 @@ export default function ProjectModal({
                     </h3>
                     <p className="text-white/70 mb-4">
                       To approve this project, please post on X mentioning{" "}
-                      <span className="text-blue-400">@collab0rators</span> and
-                      share the post URL below.
+                      <a
+                        href="https://x.com/collaborat0rs"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:text-blue-300 transition-colors"
+                      >
+                        @collaborat0rs
+                      </a>{" "}
+                      and share the post URL below.
                     </p>
                     <form onSubmit={handleTweetSubmit} className="space-y-4">
                       <input

@@ -22,7 +22,14 @@ export default function TweetApprovalInfo({
           </h3>
           <p className="text-white/70 mb-3">
             To approve a project, users must post on X mentioning{" "}
-            <span className="text-blue-400 font-medium">@collab0rators</span>{" "}
+            <a
+              href="https://x.com/collaborat0rs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 font-medium hover:text-blue-300 transition-colors"
+            >
+              @collaborat0rs
+            </a>{" "}
             and share the post URL.
           </p>
           <div className="space-y-2 text-sm text-white/60">
