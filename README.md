@@ -40,6 +40,15 @@ Collab0rators is a Web3 platform that automatically converts your GitHub activit
 - GitHub account
 - Some SOL for transaction fees
 
+### Development Setup
+
+This project uses Git hooks to ensure code quality. When you clone the repository, the following will be automatically set up:
+
+- **Pre-commit hooks**: Automatically runs `pnpm lint` before each commit
+- **Code formatting**: Ensures consistent code style across the project
+
+The hooks are managed by Husky and will be installed automatically when you run `pnpm install`.
+
 ### Installation
 
 1. Clone the repository:
