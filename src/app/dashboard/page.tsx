@@ -327,7 +327,7 @@ export default function Dashboard() {
                 </h2>
                 <button
                   className="text-white/60 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
-                  onMouseEnter={() => setShowHelp("commits")}
+                  onClick={() => setShowHelp("commits")}
                 >
                   <svg
                     className="w-6 h-6"
@@ -540,7 +540,7 @@ export default function Dashboard() {
                 </h2>
                 <button
                   className="text-white/60 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10"
-                  onMouseEnter={() => setShowHelp("tokens")}
+                  onClick={() => setShowHelp("tokens")}
                 >
                   <svg
                     className="w-6 h-6"
