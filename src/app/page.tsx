@@ -1,4 +1,5 @@
 import HeroSection from "@/components/HeroSection";
+import XLogo from "@/components/ui/XLogo";
 
 export default function Home() {
   return (
@@ -337,6 +338,60 @@ export default function Home() {
               <p className="text-white/50 text-sm mt-2">
                 collab0rators.com – Collab0rators platform
               </p>
+              
+              {/* Social Media Links */}
+              <div className="flex items-center justify-center gap-6 mt-8">
+                <a
+                  href="https://x.com/collaborat0rs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-blue-400/50 transition-all duration-300"
+                  aria-label="Follow us on X (Twitter)"
+                >
+                  <XLogo className="group-hover:scale-110 transition-transform duration-300" />
+                </a>
+                <a
+                  href="https://github.com/collab0rators"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-blue-400/50 transition-all duration-300"
+                  aria-label="View our GitHub"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-6 h-6 text-blue-400 group-hover:scale-110 transition-transform duration-300"
+                  >
+                    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+                    <path d="M9 18c-4.51 2-5-2-7-2"></path>
+                  </svg>
+                </a>
+                <a
+                  href="https://www.notion.so/Collab0rator-Web3-Project-Hub-22cc164c642780f49c10d769fccf424f?source=copy_link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-blue-400/50 transition-all duration-300"
+                  aria-label="View our Notion"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-6 h-6 text-blue-400 group-hover:scale-110 transition-transform duration-300"
+                  >
+                    <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.214V6.354c0-.654-.28-.933-.748-.887l-15.177.887c-.514.046-.747.28-.747.933zm14.337.746c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"></path>
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
           <div className="border-t border-white/10 mt-12 pt-8 text-center text-white/50 text-sm">
