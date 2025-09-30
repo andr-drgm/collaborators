@@ -1,6 +1,7 @@
 "use client";
 
 import XLogo from "@/components/ui/XLogo";
+import { TWITTER_URL } from "@/utils/links";
 
 interface TweetApprovalInfoProps {
   className?: string;
@@ -23,7 +24,7 @@ export default function TweetApprovalInfo({
           <p className="text-white/70 mb-3">
             To approve a project, users must post on X mentioning{" "}
             <a
-              href="https://x.com/collaborat0rs"
+              href={TWITTER_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-400 font-medium hover:text-blue-300 transition-colors"

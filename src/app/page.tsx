@@ -1,4 +1,5 @@
 import HeroSection from "@/components/HeroSection";
+import { TWITTER_URL } from "@/utils/links";
 
 export default function Home() {
   return (
@@ -337,6 +338,31 @@ export default function Home() {
               <p className="text-white/50 text-sm mt-2">
                 collab0rators.com – Collab0rators platform
               </p>
+              <div className="mt-6 flex items-center justify-center">
+                <a
+                  href={TWITTER_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 text-white/70 hover:text-white transition-colors"
+                >
+                  <span className="text-sm font-medium uppercase tracking-wide">
+                    Follow us on X
+                  </span>
+                  <svg
+                    aria-hidden="true"
+                    className="w-5 h-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M4 4l16 16" />
+                    <path d="M20 4L4 20" />
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
           <div className="border-t border-white/10 mt-12 pt-8 text-center text-white/50 text-sm">

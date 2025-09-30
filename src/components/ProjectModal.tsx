@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { TWITTER_URL } from "@/utils/links";
 
 interface Project {
   id: string;
@@ -458,7 +459,7 @@ export default function ProjectModal({
                     <p className="text-white/70 mb-4">
                       To approve this project, please post on X mentioning{" "}
                       <a
-                        href="https://x.com/collaborat0rs"
+                        href={TWITTER_URL}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-400 hover:text-blue-300 transition-colors"
