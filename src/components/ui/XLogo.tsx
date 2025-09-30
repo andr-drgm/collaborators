@@ -29,7 +29,6 @@ export default function XLogo({ className = "", size = "md" }: XLogoProps) {
         fontFamily="none"
         fontWeight="none"
         fontSize="none"
-        textAnchor="none"
         style={{ mixBlendMode: "normal" }}
       >
         <g transform="scale(5.12,5.12)">
