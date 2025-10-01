@@ -3,6 +3,12 @@
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 
+import {
+  GITHUB_APP_SETTINGS_URL,
+  PRIVACY_POLICY_URL,
+  TERMS_OF_USE_URL,
+} from "@/utils/links";
+
 export default function SignIn() {
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
@@ -33,6 +39,49 @@ export default function SignIn() {
               </svg>
               Continue with GitHub
             </button>
+
+            <div className="text-xs text-gray-400 leading-relaxed space-y-2">
+              <p>
+                By continuing you agree to our
+                {" "}
+                <a
+                  href={TERMS_OF_USE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-gray-200"
+                >
+                  Terms of Use
+                </a>
+                {" "}
+                and acknowledge the
+                {" "}
+                <a
+                  href={PRIVACY_POLICY_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-gray-200"
+                >
+                  Privacy Policy
+                </a>
+                .
+              </p>
+              <p>
+                We request read-only access to your GitHub profile information,
+                public repositories, and email address to calculate
+                contribution rewards. You can revoke the connection anytime
+                from your
+                {" "}
+                <a
+                  href={GITHUB_APP_SETTINGS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-gray-200"
+                >
+                  GitHub application settings
+                </a>
+                .
+              </p>
+            </div>
 
             <div className="text-center">
               <Link

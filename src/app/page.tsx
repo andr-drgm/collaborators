@@ -1,5 +1,10 @@
 import HeroSection from "@/components/HeroSection";
-import { TWITTER_URL } from "@/utils/links";
+import {
+  GITHUB_APP_SETTINGS_URL,
+  PRIVACY_POLICY_URL,
+  TERMS_OF_USE_URL,
+  TWITTER_URL,
+} from "@/utils/links";
 
 export default function Home() {
   return (
@@ -338,6 +343,46 @@ export default function Home() {
               <p className="text-white/50 text-sm mt-2">
                 collab0rators.com – Collab0rators platform
               </p>
+              <div className="mt-6 text-white/50 text-xs space-y-3 leading-relaxed">
+                <p>
+                  Collab0rators is an experimental developer rewards platform.
+                  Token allocations are not guaranteed and nothing on this site
+                  should be interpreted as financial, investment, or legal
+                  advice.
+                </p>
+                <p>
+                  When you connect GitHub we request read-only access to your
+                  public profile, email, and contribution data to power product
+                  features. You can revoke access anytime from your GitHub
+                  account settings.
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-white/60">
+                  <a
+                    href={PRIVACY_POLICY_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors"
+                  >
+                    Privacy Policy
+                  </a>
+                  <a
+                    href={TERMS_OF_USE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors"
+                  >
+                    Terms of Use
+                  </a>
+                  <a
+                    href={GITHUB_APP_SETTINGS_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors"
+                  >
+                    Manage GitHub Connection
+                  </a>
+                </div>
+              </div>
               <div className="mt-6 flex items-center justify-center">
                 <a
                   href={TWITTER_URL}
