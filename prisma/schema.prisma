@@ -17,9 +17,21 @@ model User {
   emailVerified DateTime?
   image         String?
 
+  // Privy-specific fields
+  privyId       String? @unique
+  walletAddress String? @unique
+
+  // GitHub-specific fields
   login    String?
   username String? @unique
-  tokens   Int     @default(0)
+
+  // Token tracking
+  unclaimedTokens Int @default(0)
+
+  // Internal wallet fields (legacy - can be deprecated once Privy is fully adopted)
+  walletBalance             Int?
+  walletEncryptedPrivateKey String?
+  walletPublicKey           String? @unique
 
   accounts      Account[]
   sessions      Session[]

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useSession } from "next-auth/react";
+import { usePrivyAuth } from "@/hooks/usePrivyAuth";
 import { TWITTER_URL } from "@/utils/links";
 
 interface Project {
@@ -36,7 +36,7 @@ export default function ProjectModal({
   onClose,
   onProjectSelect,
 }: ProjectModalProps) {
-  const { data: session } = useSession();
+  const { userData, getAccessToken } = usePrivyAuth();
   const [activeTab, setActiveTab] = useState<"discover" | "submit">("discover");
   const [projects, setProjects] = useState<Project[]>([]);
   const [userProjects, setUserProjects] = useState<Project[]>([]);
@@ -83,9 +83,15 @@ export default function ProjectModal({
   }, [searchTerm, statusFilter]);
 
   // Fetch user's assigned projects
-  const fetchUserProjects = async () => {
+  const fetchUserProjects = useCallback(async () => {
     try {
-      const response = await fetch("/api/projects/user");
+      const accessToken = await getAccessToken();
+      const headers: HeadersInit = {};
+      if (accessToken) {
+        headers.Authorization = `Bearer ${accessToken}`;
+      }
+
+      const response = await fetch("/api/projects/user", { headers });
       if (response.ok) {
         const data = await response.json();
         setUserProjects(data);
@@ -93,14 +99,14 @@ export default function ProjectModal({
     } catch (error) {
       console.error("Error fetching user projects:", error);
     }
-  };
+  }, [getAccessToken]);
 
   useEffect(() => {
     if (isOpen) {
       fetchProjects();
       fetchUserProjects();
     }
-  }, [isOpen, fetchProjects]);
+  }, [isOpen, fetchProjects, fetchUserProjects]);
 
   // Handle project submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -108,11 +114,17 @@ export default function ProjectModal({
     setSubmitting(true);
 
     try {
+      const accessToken = await getAccessToken();
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+      if (accessToken) {
+        headers.Authorization = `Bearer ${accessToken}`;
+      }
+
       const response = await fetch("/api/projects", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify(submitForm),
       });
 
@@ -144,13 +156,19 @@ export default function ProjectModal({
 
     setSubmittingTweet(true);
     try {
+      const accessToken = await getAccessToken();
+      const headers: HeadersInit = {
+        "Content-Type": "application/json",
+      };
+      if (accessToken) {
+        headers.Authorization = `Bearer ${accessToken}`;
+      }
+
       const response = await fetch(
         `/api/projects/${selectedProjectForTweet}/tweet`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers,
           body: JSON.stringify({ tweetUrl }),
         }
       );
@@ -175,8 +193,15 @@ export default function ProjectModal({
   // Handle assignment
   const handleAssign = async (projectId: string) => {
     try {
+      const accessToken = await getAccessToken();
+      const headers: HeadersInit = {};
+      if (accessToken) {
+        headers.Authorization = `Bearer ${accessToken}`;
+      }
+
       const response = await fetch(`/api/projects/${projectId}/assign`, {
         method: "POST",
+        headers,
       });
 
       if (response.ok) {
@@ -196,7 +221,7 @@ export default function ProjectModal({
   // Check if user is assigned to a project
   const isUserAssigned = (project: Project) => {
     return project.projectAssignments.some(
-      (assignment) => assignment.user.name === session?.user?.name
+      (assignment) => assignment.user.name === userData?.name
     );
   };
 

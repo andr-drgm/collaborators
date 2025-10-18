@@ -18,9 +18,15 @@ export interface DashboardData {
   tokensHeld: number;
 }
 
-export const fetchUserProjects = async (): Promise<Project[]> => {
+export const fetchUserProjects = async (
+  accessToken?: string
+): Promise<Project[]> => {
   try {
-    const response = await fetch("/api/projects/user");
+    const headers: HeadersInit = {};
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
+    const response = await fetch("/api/projects/user", { headers });
     if (response.ok) {
       return await response.json();
     }
@@ -32,10 +38,11 @@ export const fetchUserProjects = async (): Promise<Project[]> => {
 };
 
 export const fetchCommitsData = async (
-  selectedProject: Project | null
+  selectedProject: Project | null,
+  accessToken?: string
 ): Promise<DashboardData> => {
   try {
-    const commits = await getCommits(selectedProject);
+    const commits = await getCommits(selectedProject, accessToken);
 
     // Transform commits into the format expected by the chart
     const commitCounts: { [date: string]: number } = {};

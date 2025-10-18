@@ -1,10 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { signOut } from "next-auth/react";
+import { usePrivyAuth } from "./usePrivyAuth";
 import {
   Project,
   CommitData,
@@ -23,15 +21,21 @@ export function useDashboard() {
   const [userProjects, setUserProjects] = useState<Project[]>([]);
   const [showHelp, setShowHelp] = useState<string | null>(null);
 
-  const { data: session, status: sessionStatus } = useSession();
-  const { disconnect } = useWallet();
+  const {
+    ready,
+    authenticated,
+    userData,
+    logout: privyLogout,
+    getAccessToken,
+  } = usePrivyAuth();
   const navigate = useRouter();
 
   // Fetch user projects
   useEffect(() => {
     const loadUserProjects = async () => {
       try {
-        const projects = await fetchUserProjects();
+        const accessToken = await getAccessToken();
+        const projects = await fetchUserProjects(accessToken);
         setUserProjects(projects);
 
         // Auto-select the first project if user has projects but none selected
@@ -43,17 +47,18 @@ export function useDashboard() {
       }
     };
 
-    if (sessionStatus === "authenticated") {
+    if (authenticated && ready) {
       loadUserProjects();
     }
-  }, [sessionStatus, selectedProject]);
+  }, [authenticated, ready, selectedProject, getAccessToken]);
 
   // Fetch GitHub commits data
   useEffect(() => {
     const loadCommitsData = async () => {
       try {
         setLoading(true);
-        const data = await fetchCommitsData(selectedProject);
+        const accessToken = await getAccessToken();
+        const data = await fetchCommitsData(selectedProject, accessToken);
         setCommitData(data.commitData);
         setTotalCommits(data.totalCommits);
         setTokensHeld(data.tokensHeld);
@@ -67,23 +72,25 @@ export function useDashboard() {
       }
     };
 
-    if (sessionStatus === "authenticated") {
+    if (authenticated && ready) {
       loadCommitsData();
     }
-  }, [sessionStatus, selectedProject]);
+  }, [authenticated, ready, selectedProject, getAccessToken]);
 
-  // Handle session loading state
+  // Handle auth loading state
   useEffect(() => {
-    if (sessionStatus === "loading") setLoading(true);
-    else if (sessionStatus === "unauthenticated") {
+    if (!ready) {
+      setLoading(true);
+    } else if (!authenticated) {
       setLoading(false);
       navigate.push("/");
+    } else {
+      setLoading(false);
     }
-  }, [sessionStatus, navigate]);
+  }, [ready, authenticated, navigate]);
 
-  const handleLogout = () => {
-    disconnect();
-    signOut({ redirectTo: "/" });
+  const handleLogout = async () => {
+    await privyLogout();
   };
 
   const handleProjectSelect = (project: Project) => {
@@ -119,7 +126,19 @@ export function useDashboard() {
     selectedProject,
     userProjects,
     showHelp,
-    session,
+    session: userData
+      ? {
+          user: {
+            name: userData.name,
+            email: userData.email,
+            image: userData.image,
+            tokens: userData.unclaimedTokens || 0,
+            createdAt: userData.createdAt,
+            login: userData.username,
+            username: userData.username,
+          },
+        }
+      : null,
 
     // Actions
     setShowProjectModal,

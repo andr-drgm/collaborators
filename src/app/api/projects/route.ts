@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { getPrivyUser } from "@/lib/privy";
 import { prisma } from "@/prisma";
 
 // GET /api/projects - List all projects with search and filtering
@@ -81,9 +81,28 @@ export async function GET(request: NextRequest) {
 // POST /api/projects - Create a new project
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    // Get the authorization header
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Extract the token
+    const token = authHeader.substring(7);
+
+    // Verify the token with Privy
+    const privyUser = await getPrivyUser(token);
+    if (!privyUser) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    // Find user in database by privyId
+    const user = await prisma.user.findUnique({
+      where: { privyId: privyUser.id },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const body = await request.json();
