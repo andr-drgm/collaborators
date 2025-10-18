@@ -35,7 +35,7 @@ export function useDashboard() {
     const loadUserProjects = async () => {
       try {
         const accessToken = await getAccessToken();
-        const projects = await fetchUserProjects(accessToken);
+        const projects = await fetchUserProjects(accessToken ?? undefined);
         setUserProjects(projects);
 
         // Auto-select the first project if user has projects but none selected
@@ -58,7 +58,10 @@ export function useDashboard() {
       try {
         setLoading(true);
         const accessToken = await getAccessToken();
-        const data = await fetchCommitsData(selectedProject, accessToken);
+        const data = await fetchCommitsData(
+          selectedProject,
+          accessToken ?? undefined
+        );
         setCommitData(data.commitData);
         setTotalCommits(data.totalCommits);
         setTokensHeld(data.tokensHeld);

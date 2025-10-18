@@ -2,13 +2,18 @@
 
 import { useState } from "react";
 import { usePrivyAuth } from "@/hooks/usePrivyAuth";
-import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
+import { Keypair, PublicKey, Transaction, Connection } from "@solana/web3.js";
 import {
   createMintToInstruction,
   getAssociatedTokenAddress,
   createAssociatedTokenAccountInstruction,
 } from "@solana/spl-token";
 import bs58 from "bs58";
+
+// Extend the wallet type to include Solana signing methods
+interface SolanaWallet {
+  signTransaction: (transaction: Transaction) => Promise<Transaction>;
+}
 
 interface TokenClaimButtonProps {
   tokensHeld: number;
@@ -61,6 +66,14 @@ export default function TokenClaimButton({
 
     try {
       setIsClaiming(true);
+
+      // Create Solana connection
+      const connection = new Connection(
+        process.env.NEXT_PUBLIC_SOLANA_RPC_URL ||
+          "https://api.devnet.solana.com",
+        "confirmed"
+      );
+
       const mintAddress = new PublicKey(
         "H4bLS9gYGfrHL2CfbtqRf4HhixyXqEXoinFExBdvMrkT"
       );
@@ -79,7 +92,7 @@ export default function TokenClaimButton({
       const transaction = new Transaction();
 
       // Check if the associated token account exists
-      const accountInfo = await embeddedWallet.getAccountInfo(userTokenAccount);
+      const accountInfo = await connection.getAccountInfo(userTokenAccount);
 
       if (!accountInfo) {
         console.log("Associated token account not found. Creating it...");
@@ -105,20 +118,30 @@ export default function TokenClaimButton({
       );
 
       // Set recent blockhash and fee payer
-      const { blockhash } = await embeddedWallet.getLatestBlockhash();
+      const { blockhash } = await connection.getLatestBlockhash();
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = publicKey;
 
       // Partially sign with the mint authority's keypair
       transaction.partialSign(mintAuthority);
 
-      // Send the transaction for the user to approve
-      console.log("Sending transaction for user approval...");
-      const signature = await embeddedWallet.sendTransaction(transaction);
+      // Serialize and encode transaction for Privy wallet to sign
+      console.log("Requesting user signature...");
+
+      // Sign the transaction with the user's wallet
+      const signedTx = await (
+        embeddedWallet as unknown as SolanaWallet
+      ).signTransaction(transaction);
+
+      // Send the signed transaction
+      console.log("Sending signed transaction...");
+      const signature = await connection.sendRawTransaction(
+        signedTx.serialize()
+      );
       console.log("Transaction sent with signature:", signature);
 
       // Confirm the transaction
-      await embeddedWallet.confirmTransaction(signature, "confirmed");
+      await connection.confirmTransaction(signature, "confirmed");
       console.log("Transaction confirmed!");
 
       alert(`Tokens minted successfully! Signature: ${signature}`);

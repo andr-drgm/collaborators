@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
       {
         owner,
         repo,
-        author: user.username, // Changed from committer to author for better filtering
+        author: user.username ?? undefined, // Changed from committer to author for better filtering
       }
     );
 

@@ -9,26 +9,30 @@ export const privyServer = new PrivyClient(
 
 interface LinkedAccount {
   type: string;
-  subject?: string;
-  username?: string;
-  name?: string;
-  profilePictureUrl?: string;
-  avatarUrl?: string;
-  accessToken?: string;
-  address?: string;
+  subject?: string | null;
+  username?: string | null;
+  name?: string | null;
+  profilePictureUrl?: string | null;
+  avatarUrl?: string | null;
+  accessToken?: string | null;
+  address?: string | null;
 }
 
 interface PrivyUser {
   id: string;
   linkedAccounts?: LinkedAccount[];
-  email?: { address?: string };
-  wallet?: { address?: string; walletClientType?: string; chainType?: string };
+  email?: { address?: string | null };
+  wallet?: {
+    address?: string | null;
+    walletClientType?: string | null;
+    chainType?: string | null;
+  };
   github?: {
-    subject?: string;
-    name?: string;
-    username?: string;
-    profilePictureUrl?: string;
-    avatarUrl?: string;
+    subject?: string | null;
+    name?: string | null;
+    username?: string | null;
+    profilePictureUrl?: string | null;
+    avatarUrl?: string | null;
   };
 }
 

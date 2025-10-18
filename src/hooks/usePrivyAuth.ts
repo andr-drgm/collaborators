@@ -37,6 +37,11 @@ export function usePrivyAuth() {
     (wallet) => wallet.walletClientType === "privy"
   );
 
+  // Get external wallet (non-Privy wallet like Phantom)
+  const externalWallet = wallets.find(
+    (wallet) => wallet.walletClientType !== "privy"
+  );
+
   // Fallback: Get wallet from user profile if not found in wallets hook
   const fallbackWallet = privyUser?.wallet
     ? {
@@ -152,6 +157,7 @@ export function usePrivyAuth() {
     embeddedWallet: walletForTransactions, // Use actual wallet object for transactions
     embeddedWalletAddress: finalEmbeddedWallet?.address, // Use fallback for display
     internalWalletAddress: finalEmbeddedWallet?.address,
+    externalWalletAddress: externalWallet?.address, // External wallet like Phantom
     // Primary wallet address for authentication/identification
     walletAddress: finalEmbeddedWallet?.address,
 
