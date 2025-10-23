@@ -1,10 +1,21 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { usePrivy } from "@privy-io/react-auth";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import Image from "next/image";
 import RippleGrid from "./ui/RippleGrid";
 
 export default function HeroSection() {
+  const { login, authenticated } = usePrivy();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (authenticated) {
+      router.push("/dashboard");
+    }
+  }, [authenticated, router]);
+
   return (
     <section className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
       {/* Animated background elements */}
@@ -112,7 +123,7 @@ export default function HeroSection() {
           {/* CTA Button */}
           <div className="w-full max-w-xs">
             <button
-              onClick={() => signIn("github", { redirectTo: "/dashboard" })}
+              onClick={login}
               className="btn-primary w-full py-4 text-lg flex items-center justify-center gap-3 group"
             >
               <svg

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { getPrivyUser } from "@/lib/privy";
 import { prisma } from "@/prisma";
 
 // POST /api/projects/[id]/assign - Assign user to a project
@@ -8,9 +8,28 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    // Get the authorization header
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Extract the token
+    const token = authHeader.substring(7);
+
+    // Verify the token with Privy
+    const privyUser = await getPrivyUser(token);
+    if (!privyUser) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    // Find user in database by privyId
+    const user = await prisma.user.findUnique({
+      where: { privyId: privyUser.id },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const { id: projectId } = await params;
@@ -35,7 +54,7 @@ export async function POST(
     const existingAssignment = await prisma.projectAssignment.findUnique({
       where: {
         userId_projectId: {
-          userId: session.user.id,
+          userId: user.id,
           projectId: projectId,
         },
       },
@@ -51,7 +70,7 @@ export async function POST(
     // Create assignment
     const assignment = await prisma.projectAssignment.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         projectId: projectId,
       },
       include: {
@@ -80,9 +99,28 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
+    // Get the authorization header
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Extract the token
+    const token = authHeader.substring(7);
+
+    // Verify the token with Privy
+    const privyUser = await getPrivyUser(token);
+    if (!privyUser) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    // Find user in database by privyId
+    const user = await prisma.user.findUnique({
+      where: { privyId: privyUser.id },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const { id: projectId } = await params;
@@ -91,7 +129,7 @@ export async function DELETE(
     const existingAssignment = await prisma.projectAssignment.findUnique({
       where: {
         userId_projectId: {
-          userId: session.user.id,
+          userId: user.id,
           projectId: projectId,
         },
       },
@@ -108,7 +146,7 @@ export async function DELETE(
     await prisma.projectAssignment.delete({
       where: {
         userId_projectId: {
-          userId: session.user.id,
+          userId: user.id,
           projectId: projectId,
         },
       },

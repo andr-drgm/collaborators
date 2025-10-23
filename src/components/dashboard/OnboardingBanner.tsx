@@ -1,6 +1,6 @@
 "use client";
 
-import { useWallet } from "@solana/wallet-adapter-react";
+import { usePrivyAuth } from "@/hooks/usePrivyAuth";
 
 interface OnboardingBannerProps {
   onShowHelp: (helpType: string) => void;
@@ -9,9 +9,9 @@ interface OnboardingBannerProps {
 export default function OnboardingBanner({
   onShowHelp,
 }: OnboardingBannerProps) {
-  const { publicKey } = useWallet();
+  const { walletAddress } = usePrivyAuth();
 
-  if (publicKey) return null;
+  if (walletAddress) return null;
 
   return (
     <div className="mb-10 liquid-glass rounded-2xl p-6 transition-all duration-500 hover:liquid-glass-hover">
@@ -33,18 +33,18 @@ export default function OnboardingBanner({
         </div>
         <div className="flex-1">
           <h3 className="font-semibold text-blue-200 text-lg">
-            Connect Your Wallet to Start Earning
+            Wallet Ready - Start Earning!
           </h3>
           <p className="text-blue-300 text-sm">
-            Link your Solana wallet to claim SOL tokens for your GitHub
-            contributions
+            Your Privy embedded wallet is ready. Start contributing to earn SOL
+            tokens for your GitHub activity.
           </p>
         </div>
         <button
           className="btn-primary px-6 py-3 text-sm"
           onClick={() => onShowHelp("wallet")}
         >
-          Need Help?
+          Learn More
         </button>
       </div>
     </div>
