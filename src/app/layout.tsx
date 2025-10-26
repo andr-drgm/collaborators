@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import PrivyProviders from "./PrivyProviders";
+import Navigation from "@/components/Navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,17 +15,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Collab0rators - Transform Open Source into On-Chain Rewards",
+  title: "Collab0rators - GitHub Bounty Marketplace",
   description:
-    "Earn NFT badges and SOL tokens for your real contributions on GitHub. Build on-chain reputation and get rewarded for open-source collaboration.",
+    "Find GitHub issues with USDC bounties or create your own. Get paid automatically when your pull request is merged. Earn USDC for solving open source problems.",
   keywords: [
     "GitHub",
-    "blockchain",
-    "Solana",
-    "NFT",
+    "bounty",
+    "USDC",
     "developer rewards",
     "open source",
-    "collaboration",
+    "pull requests",
+    "issues",
   ],
   authors: [{ name: "Collab0rators Team" }],
   icons: {
@@ -49,18 +50,18 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "Collab0rators - Open Source to Blockchain Rewards",
+    title: "Collab0rators - GitHub Bounty Marketplace",
     description:
-      "Transform your Open Source contributions into on-chain rewards and reputation",
+      "Find GitHub issues with USDC bounties or create your own. Get paid automatically when your pull request is merged.",
     type: "website",
     url: "https://collab0rators.com",
     siteName: "Collab0rators",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Collab0rators - Commits to Blockchain Rewards",
+    title: "Collab0rators - GitHub Bounty Marketplace",
     description:
-      "Transform your Open Source contributions into on-chain rewards and reputation",
+      "Find GitHub issues with USDC bounties or create your own. Get paid automatically when your pull request is merged.",
   },
 };
 
@@ -74,7 +75,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased animated-background bg-gradient-to-b from-black via-blue-950/20 to-red-950/20`}
       >
-        <PrivyProviders>{children}</PrivyProviders>
+        <PrivyProviders>
+          <Navigation />
+          {children}
+        </PrivyProviders>
       </body>
     </html>
   );

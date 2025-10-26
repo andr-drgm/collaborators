@@ -16,7 +16,7 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-b from-black via-blue-950/20 to-black"></div>
         <div className="container mx-auto px-4 max-w-6xl relative z-10">
           <h2 className="text-5xl font-bold mb-20 text-center gradient-text">
-            Web3 Development Suite
+            GitHub Bounty Marketplace
           </h2>
 
           <div className="grid md:grid-cols-3 gap-12">
@@ -32,16 +32,17 @@ export default function Home() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
               </div>
               <h3 className="text-2xl font-semibold mb-4 text-white">
-                Analyze User Activity
+                Discover Issues
               </h3>
               <p className="text-white/70 leading-relaxed">
-                Track developer contributions across our platform. Gain insights
-                into project engagement and collaborative patterns.
+                Browse GitHub issues across all public repositories. Find bugs
+                to fix, features to build, and problems to solve for USDC
+                rewards.
               </p>
             </div>
 
@@ -62,12 +63,12 @@ export default function Home() {
                 </svg>
               </div>
               <h3 className="text-2xl font-semibold mb-4 text-white">
-                Rewarding Contributors
+                Earn USDC Rewards
               </h3>
               <p className="text-white/70 leading-relaxed">
-                Earn SOL tokens for meaningful GitHub activity: code commits,
-                pull requests, reviews, and issue resolution. Rewards go
-                directly to your linked wallet.
+                Get paid in USDC for solving GitHub issues. Automatic
+                verification when your pull request is merged. Rewards are
+                escrowed upfront for guaranteed payment.
               </p>
             </div>
 
@@ -83,17 +84,17 @@ export default function Home() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M16 4v12m-4-4v4m-4-4v4M4 4h.01M8 4h.01M12 4h.01M16 4h.01M20 4h.01M4 8h.01M8 8h.01M12 8h.01M16 8h.01M20 8h.01M4 12h.01M8 12h.01M12 12h.01M16 12h.01M20 12h.01M4 16h.01M8 16h.01M12 16h.01M16 16h.01M20 16h.01"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
                   />
                 </svg>
               </div>
               <h3 className="text-2xl font-semibold mb-4 text-white">
-                Gamification
+                Automatic Tracking
               </h3>
               <p className="text-white/70 leading-relaxed">
-                Turn Collab0rators into a game. Unlock achievements, climb
-                leaderboards, and get real-time feedback for secure, high-impact
-                contributions.
+                Our GitHub bot automatically tracks issue status, PR merges, and
+                solution verification. No manual intervention needed - just code
+                and get paid.
               </p>
             </div>
           </div>
@@ -125,10 +126,10 @@ export default function Home() {
                 How it works
               </h2>
               <p className="text-white/70 mb-8 text-lg leading-relaxed">
-                Automatically convert GitHub activity into verifiable on-chain
-                achievements. Every meaningful contribution mints NFT badges and
-                earns SOL tokens. Track your impact, build your on-chain
-                reputation, and get rewarded for open-source collaboration.
+                Find GitHub issues with USDC bounties, solve them with pull
+                requests, and get paid automatically when your solution is
+                merged. Our bot tracks everything and ensures fair, transparent
+                payments.
               </p>
               <div className="space-y-6">
                 <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
@@ -136,7 +137,7 @@ export default function Home() {
                     <span className="text-white font-bold">1</span>
                   </div>
                   <span className="text-white/90 font-medium">
-                    Connect your GitHub and Solana wallet accounts.
+                    Browse GitHub issues and add USDC bounties
                   </span>
                 </div>
                 <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
@@ -144,7 +145,7 @@ export default function Home() {
                     <span className="text-white font-bold">2</span>
                   </div>
                   <span className="text-white/90 font-medium">
-                    Collaborate & Commit Code
+                    Developers submit pull request solutions
                   </span>
                 </div>
                 <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
@@ -152,7 +153,7 @@ export default function Home() {
                     <span className="text-white font-bold">3</span>
                   </div>
                   <span className="text-white/90 font-medium">
-                    All collaborations are minted into SOL tokens.
+                    Bot automatically verifies when PR is merged
                   </span>
                 </div>
                 <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
@@ -160,7 +161,7 @@ export default function Home() {
                     <span className="text-white font-bold">4</span>
                   </div>
                   <span className="text-white/90 font-medium">
-                    User activity will be analyzed.
+                    USDC payment is automatically released
                   </span>
                 </div>
               </div>
@@ -207,34 +208,34 @@ export default function Home() {
           <div className="space-y-6">
             <div className="glass-card rounded-2xl p-8 transition-all duration-500 hover:glass-card-hover">
               <h3 className="text-xl font-semibold mb-3 text-white">
-                How do contributions get tracked?
+                How are bounties verified?
               </h3>
               <p className="text-white/70 leading-relaxed">
-                We analyze your GitHub activity including commits, pull
-                requests, code reviews, and issue contributions. Each meaningful
-                contribution is evaluated and converted into rewards.
+                Our GitHub bot automatically tracks when pull requests are
+                merged that reference bounty issues. When a PR closes an issue,
+                the bot verifies the solution and releases the USDC payment.
               </p>
             </div>
 
             <div className="glass-card rounded-2xl p-8 transition-all duration-500 hover:glass-card-hover">
               <h3 className="text-xl font-semibold mb-3 text-white">
-                When do SOL tokens get transferred?
+                When do USDC payments get released?
               </h3>
               <p className="text-white/70 leading-relaxed">
-                SOL tokens are minted and transferred to your wallet immediately
-                after your contributions are verified. You can claim them at any
-                time from your dashboard.
+                USDC payments are escrowed when bounties are created and
+                automatically released when your pull request is merged and
+                verified. Payments go directly to your connected wallet.
               </p>
             </div>
 
             <div className="glass-card rounded-2xl p-8 transition-all duration-500 hover:glass-card-hover">
               <h3 className="text-xl font-semibold mb-3 text-white">
-                What blockchains or wallets are supported?
+                What repositories are supported?
               </h3>
               <p className="text-white/70 leading-relaxed">
-                Currently, we support Solana blockchain with any
-                Solana-compatible wallet (Phantom, Solflare, etc.). More
-                blockchain support is coming soon!
+                Any public GitHub repository! You can browse issues across all
+                public repositories and add bounties to any issue you find
+                interesting. No repository opt-in required.
               </p>
             </div>
           </div>
