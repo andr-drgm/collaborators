@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Collab0rators - GitHub Bounty Marketplace",
+  title: "Collaborators - GitHub Bounty Marketplace",
   description:
     "Find GitHub issues with USDC bounties or create your own. Get paid automatically when your pull request is merged. Earn USDC for solving open source problems.",
   keywords: [
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     "pull requests",
     "issues",
   ],
-  authors: [{ name: "Collab0rators Team" }],
+  authors: [{ name: "Collaborators Team" }],
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
@@ -49,16 +49,16 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "Collab0rators - GitHub Bounty Marketplace",
+    title: "Collaborators - GitHub Bounty Marketplace",
     description:
       "Find GitHub issues with USDC bounties or create your own. Get paid automatically when your pull request is merged.",
     type: "website",
     url: "https://collab0rators.com",
-    siteName: "Collab0rators",
+    siteName: "Collaborators",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Collab0rators - GitHub Bounty Marketplace",
+    title: "Collaborators - GitHub Bounty Marketplace",
     description:
       "Find GitHub issues with USDC bounties or create your own. Get paid automatically when your pull request is merged.",
   },

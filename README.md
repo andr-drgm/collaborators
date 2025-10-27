@@ -4,7 +4,7 @@ Transform your GitHub work into on-chain rewards and reputation. Earn NFT badges
 
 ## 🚀 What We've Built
 
-Collab0rators is a Web3 platform that automatically converts your GitHub activity into verifiable on-chain achievements. Every meaningful contribution mints NFT badges and earns SOL tokens, helping you build your on-chain reputation while getting rewarded for open-source collaboration.
+Collaborators is a Web3 platform that automatically converts your GitHub activity into verifiable on-chain achievements. Every meaningful contribution mints NFT badges and earns SOL tokens, helping you build your on-chain reputation while getting rewarded for open-source collaboration.
 
 ## ✨ Key Features
 
@@ -175,6 +175,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Collab0rators** - Building the future of developer collaboration and rewards.
+**Collaborators** - Building the future of developer collaboration and rewards.
 
 _Transform your contributions. Build your reputation. Get rewarded._

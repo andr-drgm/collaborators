@@ -58,7 +58,7 @@ export default function HeroSection() {
               <Image
                 width={100}
                 height={100}
-                alt="Collab0rators Logo"
+                alt="Collaborators Logo"
                 decoding="async"
                 data-nimg="fill"
                 className="object-contain relative z-10"
@@ -78,7 +78,7 @@ export default function HeroSection() {
 
           {/* Title with gradient text */}
           <h1 className="text-5xl font-bold tracking-tight gradient-text">
-            Collab0rators
+            Collaborators
           </h1>
 
           {/* Subtitle */}

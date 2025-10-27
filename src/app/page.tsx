@@ -336,17 +336,17 @@ export default function Home() {
           <div className="flex flex-col items-center justify-center text-center">
             <div className="max-w-2xl">
               <h3 className="text-xl font-semibold mb-4 gradient-text">
-                Collab0rators
+                Collaborators
               </h3>
               <p className="text-white/70 text-lg">
                 On-chain developer reputation system powered by Solana
               </p>
               <p className="text-white/50 text-sm mt-2">
-                collab0rators.com – Collab0rators platform
+                collaborators.build – Collaborators platform
               </p>
               <div className="mt-6 text-white/50 text-xs space-y-3 leading-relaxed">
                 <p>
-                  Collab0rators is an experimental developer rewards platform.
+                  Collaborators is an experimental developer rewards platform.
                   Token allocations are not guaranteed and nothing on this site
                   should be interpreted as financial, investment, or legal
                   advice.
@@ -412,7 +412,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-white/10 mt-12 pt-8 text-center text-white/50 text-sm">
-            © 2025 Collab0rators.
+            © 2025 Collaborators.
           </div>
         </div>
       </footer>
