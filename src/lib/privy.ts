@@ -127,36 +127,71 @@ export async function syncPrivyUserToDb(
 
     console.log("Extracted GitHub image:", githubImage);
 
-    // Upsert user in database
-    const user = await prisma.user.upsert({
-      where: { privyId: privyUser.id },
-      update: {
-        name:
-          githubAccount?.name ||
-          privyUser.github?.name ||
-          privyUser.email?.address?.split("@")[0] ||
-          "User",
-        email: privyUser.email?.address,
-        username: githubAccount?.username || privyUser.github?.username,
-        login: githubAccount?.username || privyUser.github?.username,
-        image: githubImage,
-        walletAddress: wallet?.address,
-      },
-      create: {
-        privyId: privyUser.id,
-        name:
-          githubAccount?.name ||
-          privyUser.github?.name ||
-          privyUser.email?.address?.split("@")[0] ||
-          "User",
-        email: privyUser.email?.address,
-        username: githubAccount?.username || privyUser.github?.username,
-        login: githubAccount?.username || privyUser.github?.username,
-        image: githubImage,
-        walletAddress: wallet?.address,
-        unclaimedTokens: 0,
-      },
-    });
+    const username = githubAccount?.username || privyUser.github?.username;
+
+    // Check if a user with this username already exists (without privyId)
+    let existingUserByUsername = null;
+    if (username) {
+      existingUserByUsername = await prisma.user.findUnique({
+        where: { username },
+      });
+    }
+
+    let user;
+
+    // If there's an existing user with this username but no privyId, link them
+    if (existingUserByUsername && !existingUserByUsername.privyId) {
+      console.log(
+        `Found existing user with username ${username}, linking privyId ${privyUser.id}`
+      );
+      user = await prisma.user.update({
+        where: { id: existingUserByUsername.id },
+        data: {
+          privyId: privyUser.id,
+          name:
+            githubAccount?.name ||
+            privyUser.github?.name ||
+            privyUser.email?.address?.split("@")[0] ||
+            existingUserByUsername.name ||
+            "User",
+          email: privyUser.email?.address || existingUserByUsername.email,
+          image: githubImage || existingUserByUsername.image,
+          walletAddress:
+            wallet?.address || existingUserByUsername.walletAddress,
+        },
+      });
+    } else {
+      // Upsert user in database
+      user = await prisma.user.upsert({
+        where: { privyId: privyUser.id },
+        update: {
+          name:
+            githubAccount?.name ||
+            privyUser.github?.name ||
+            privyUser.email?.address?.split("@")[0] ||
+            "User",
+          email: privyUser.email?.address,
+          username: username,
+          login: username,
+          image: githubImage,
+          walletAddress: wallet?.address,
+        },
+        create: {
+          privyId: privyUser.id,
+          name:
+            githubAccount?.name ||
+            privyUser.github?.name ||
+            privyUser.email?.address?.split("@")[0] ||
+            "User",
+          email: privyUser.email?.address,
+          username: username,
+          login: username,
+          image: githubImage,
+          walletAddress: wallet?.address,
+          unclaimedTokens: 0,
+        },
+      });
+    }
 
     // If GitHub account is linked, also sync the account
     if (githubAccount) {
