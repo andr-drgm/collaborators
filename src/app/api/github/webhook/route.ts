@@ -185,11 +185,15 @@ async function handlePullRequestEvent(event: PullRequestEvent) {
       `PR ${pull_request.number} merged in ${repository.owner.login}/${repository.name}`
     );
 
-    // Find ALL submissions for this PR across all bounties
+    // Find submissions for this PR in the specific repository
     const submissions = await prisma.bountySubmission.findMany({
       where: {
         prNumber: pull_request.number,
         status: "PENDING",
+        bounty: {
+          githubRepoOwner: repository.owner.login,
+          githubRepoName: repository.name,
+        },
       },
       include: {
         bounty: true,
@@ -203,12 +207,8 @@ async function handlePullRequestEvent(event: PullRequestEvent) {
     for (const submission of submissions) {
       const bounty = submission.bounty;
 
-      // Check if the bounty is for the same repository
-      if (
-        bounty.githubRepoOwner === repository.owner.login &&
-        bounty.githubRepoName === repository.name &&
-        bounty.status === "ACTIVE"
-      ) {
+      // Repository is already matched by the query, just check if bounty is active
+      if (bounty.status === "ACTIVE") {
         console.log(
           `Marking bounty ${bounty.id} as solved by user ${submission.userId}`
         );
