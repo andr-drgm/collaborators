@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { usePrivyAuth } from "./usePrivyAuth";
+import { usePrivyAuth } from "../usePrivyAuth";
 import {
   Project,
   CommitData,
   fetchUserProjects,
   fetchCommitsData,
-} from "@/utils/dashboardUtils";
+} from "@/utils/archive/dashboardUtils";
 
 export function useDashboard() {
   const [loading, setLoading] = useState(false);

@@ -2,18 +2,19 @@ import Image from "next/image";
 
 interface ProfileCardProps {
   imageUrl: string | undefined | null;
-  name: string | undefined | null;
+  name?: string | undefined | null;
   username: string | undefined | null;
   memberSince: string | undefined | null;
   className?: string;
+  githubUsername?: string | undefined | null;
 }
 
 export default function ProfileCard({
   imageUrl,
-  name,
   username,
   memberSince,
   className = "",
+  githubUsername,
 }: ProfileCardProps) {
   return (
     <div className={`flex flex-col items-center ${className}`}>
@@ -40,16 +41,19 @@ export default function ProfileCard({
 
       {/* Profile Info with liquid glass card */}
       <div className="liquid-glass rounded-2xl p-6 w-full max-w-sm text-center transition-all duration-500 hover:liquid-glass-hover">
-        {name ? (
-          <div className="text-2xl font-bold text-white mb-2">{name}</div>
+        {githubUsername ? (
+          <a
+            href={`https://github.com/${githubUsername}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-2xl font-bold text-white mb-2 hover:text-blue-400 transition-colors block"
+          >
+            @{githubUsername}
+          </a>
+        ) : username ? (
+          <div className="text-2xl font-bold text-white mb-2">{username}</div>
         ) : (
           <div className="h-8 w-48 bg-white/10 rounded-lg animate-pulse mb-2"></div>
-        )}
-
-        {username ? (
-          <div className="text-lg text-white/80 mb-2">{username}</div>
-        ) : (
-          <div className="h-6 w-32 bg-white/10 rounded-lg animate-pulse mb-2"></div>
         )}
 
         {memberSince ? (
