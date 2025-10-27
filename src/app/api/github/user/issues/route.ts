@@ -80,24 +80,38 @@ export async function GET(request: NextRequest) {
     });
 
     try {
-      // Use the GitHub Issues API to get issues for the authenticated user
-      // Filter by created to only get issues created by the user
-      console.log("Fetching issues for authenticated user...");
+      // Get the user's GitHub username from the database user record
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const githubUsername = (user as any).username || (user as any).login;
 
-      const issuesResponse = await octokit.request("GET /issues", {
-        state: state as "open" | "closed" | "all",
-        sort: sort as "created" | "updated" | "comments",
-        direction: direction as "asc" | "desc",
+      if (!githubUsername) {
+        console.error("API: No GitHub username available");
+        return NextResponse.json([]);
+      }
+
+      console.log("Fetching issues for user:", githubUsername);
+
+      // Use GitHub Search API to find issues created by this user
+      // This is more reliable than /issues which may have permission issues
+      const stateQuery = state === "all" ? "" : `is:${state}`;
+      const searchQuery = `author:${githubUsername} type:issue ${stateQuery}`;
+
+      const issuesResponse = await octokit.request("GET /search/issues", {
+        q: searchQuery,
+        sort: sort as "updated" | "created" | "comments",
+        order: direction as "asc" | "desc",
         per_page: Math.min(per_page, 100), // GitHub allows up to 100 per page
       });
 
-      console.log(`Found ${issuesResponse.data.length} issues for user`);
+      console.log(
+        `Found ${issuesResponse.data.items?.length || 0} issues for user`
+      );
 
       // Apply label filtering if specified
-      let filteredIssues = issuesResponse.data;
+      let filteredIssues = issuesResponse.data.items || [];
       if (labels) {
         const labelList = labels.split(",").map((l) => l.trim().toLowerCase());
-        filteredIssues = issuesResponse.data.filter((issue) =>
+        filteredIssues = filteredIssues.filter((issue) =>
           issue.labels.some((label) => {
             const labelName = typeof label === "string" ? label : label.name;
             return labelName && labelList.includes(labelName.toLowerCase());
