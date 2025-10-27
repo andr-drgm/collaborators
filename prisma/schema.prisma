@@ -38,8 +38,13 @@ model User {
   // Optional for WebAuthn support
   Authenticator Authenticator[]
 
-  // Project-related relationships
+  // Project-related relationships (legacy)
   projectAssignments ProjectAssignment[]
+
+  // Bounty marketplace relationships
+  postedBounties    Bounty[]           @relation("BountyPoster")
+  bountySubmissions BountySubmission[]
+  botInstallations  BotInstallation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -102,7 +107,91 @@ model Authenticator {
   @@id([userId, credentialID])
 }
 
-// Project management models
+// Bounty marketplace models
+model Bounty {
+  id              String  @id @default(cuid())
+  githubIssueId   Int // GitHub issue number
+  githubRepoOwner String // GitHub repo owner/org
+  githubRepoName  String // GitHub repo name
+  title           String
+  description     String
+  bountyAmount    Decimal // USDC amount
+  bountyPosterId  String // User who posted the bounty
+
+  // Status tracking
+  status   BountyStatus @default(ACTIVE)
+  isSolved Boolean      @default(false)
+  solvedAt DateTime?
+  solvedBy String? // Username of the user who solved it
+
+  // GitHub integration
+  githubIssueUrl String
+  githubLabels   String[] // Labels added by our bot
+
+  // Relationships
+  bountyPoster User               @relation("BountyPoster", fields: [bountyPosterId], references: [id], onDelete: Cascade)
+  submissions  BountySubmission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([githubIssueId, githubRepoOwner, githubRepoName]) // One bounty per issue
+}
+
+model BountySubmission {
+  id       String           @id @default(cuid())
+  bountyId String
+  userId   String
+  prUrl    String // GitHub PR URL
+  prNumber Int // GitHub PR number
+  status   SubmissionStatus @default(PENDING)
+
+  // Verification
+  isVerified Boolean   @default(false)
+  verifiedAt DateTime?
+
+  // Relationships
+  bounty Bounty @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([bountyId, userId]) // One submission per user per bounty
+}
+
+// Enums
+enum BountyStatus {
+  ACTIVE // Bounty is live and open for submissions
+  SOLVED // Bounty completed (manual payout by maintainer)
+  EXPIRED // Bounty expired without completion
+  CANCELLED // Bounty cancelled by poster
+}
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Bot installation tracking
+model BotInstallation {
+  id          String  @id @default(cuid())
+  owner       String // GitHub owner/org
+  repo        String // GitHub repo name
+  installed   Boolean @default(false)
+  installedBy String // User who installed the bot
+
+  // Relationships
+  installedByUser User @relation(fields: [installedBy], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([owner, repo]) // One installation record per repo
+}
+
+// Legacy project models (deprecated - keeping for migration)
 model Project {
   id          String  @id @default(cuid())
   name        String

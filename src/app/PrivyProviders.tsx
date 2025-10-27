@@ -2,6 +2,7 @@
 
 import { PrivyProvider } from "@privy-io/react-auth";
 import { ReactNode } from "react";
+import OAuthTokenHandler from "@/components/OAuthTokenHandler";
 
 export default function PrivyProviders({ children }: { children: ReactNode }) {
   return (
@@ -73,6 +74,7 @@ export default function PrivyProviders({ children }: { children: ReactNode }) {
         },
       }}
     >
+      <OAuthTokenHandler />
       {children}
     </PrivyProvider>
   );

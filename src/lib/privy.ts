@@ -66,6 +66,32 @@ export async function getPrivyUser(accessToken: string) {
   }
 }
 
+// Helper to verify Privy token and return user info
+export async function verifyPrivyToken(request: Request) {
+  try {
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return { success: false, error: "No authorization header" };
+    }
+
+    const accessToken = authHeader.substring(7);
+    const privyUser = await getPrivyUser(accessToken);
+
+    if (!privyUser) {
+      return { success: false, error: "Invalid token" };
+    }
+
+    return {
+      success: true,
+      userId: privyUser.id,
+      user: privyUser,
+    };
+  } catch (error) {
+    console.error("Error verifying Privy token:", error);
+    return { success: false, error: "Token verification failed" };
+  }
+}
+
 // Helper to sync Privy user with database
 export async function syncPrivyUserToDb(
   privyUser: PrivyUser,

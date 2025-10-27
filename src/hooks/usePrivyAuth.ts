@@ -1,7 +1,7 @@
 "use client";
 
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 export interface PrivyUserData {
@@ -31,6 +31,7 @@ export function usePrivyAuth() {
   const { wallets } = useWallets();
   const [userData, setUserData] = useState<PrivyUserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const loggedUsernames = useRef(new Set<string>());
 
   // Get the embedded Solana wallet (Privy embedded wallet)
   const embeddedWallet = wallets.find(
@@ -135,14 +136,30 @@ export function usePrivyAuth() {
       ? githubAccount.username
       : null) || userData?.username;
 
+  // Debug: Log GitHub account information (only when it changes)
+  useEffect(() => {
+    if (
+      githubAccount?.username &&
+      !loggedUsernames.current.has(githubAccount.username)
+    ) {
+      console.log("✅ GitHub account linked:", githubAccount.username);
+      loggedUsernames.current.add(githubAccount.username);
+    }
+  }, [githubAccount?.username]);
+
   // Get GitHub access token
   const getGithubAccessToken = async () => {
     const githubAccount = privyUser?.linkedAccounts?.find(
       (account) => account.type === "github_oauth"
     );
-    return githubAccount && "accessToken" in githubAccount
-      ? githubAccount.accessToken
-      : undefined;
+
+    if (githubAccount && "accessToken" in githubAccount) {
+      console.log("GitHub access token found in linkedAccounts");
+      return githubAccount.accessToken;
+    }
+
+    console.log("No GitHub access token found in linkedAccounts");
+    return undefined;
   };
 
   return {
