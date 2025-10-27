@@ -812,7 +812,7 @@ export default function Dashboard() {
                           <span className="font-mono text-sm bg-white/10 px-2 py-1 rounded break-all">
                             {typeof window !== "undefined"
                               ? window.location.origin
-                              : "https://collab0rators.com"}
+                              : "https://collaborators.build"}
                             /api/github/webhook
                           </span>
                         </div>

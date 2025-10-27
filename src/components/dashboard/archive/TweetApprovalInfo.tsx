@@ -40,7 +40,7 @@ export default function TweetApprovalInfo({
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
-              <span>Post on X mentioning @collab0rators</span>
+              <span>Post on X mentioning @collaborat0rs</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-blue-400 rounded-full"></span>

@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     description:
       "Find GitHub issues with USDC bounties or create your own. Get paid automatically when your pull request is merged.",
     type: "website",
-    url: "https://collab0rators.com",
+    url: "https://collaborators.build",
     siteName: "Collaborators",
   },
   twitter: {

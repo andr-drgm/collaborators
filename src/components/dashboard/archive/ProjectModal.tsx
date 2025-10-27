@@ -596,7 +596,7 @@ export default function ProjectModal({
                   placeholder="https://x.com/username/status/123456789"
                 />
                 <p className="text-white/60 text-sm mt-1">
-                  Include an X post mentioning @collab0rators for immediate
+                  Include an X post mentioning @collaborat0rs for immediate
                   approval, or leave empty to submit for later approval.
                 </p>
               </div>

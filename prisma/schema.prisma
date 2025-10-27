@@ -200,7 +200,7 @@ model Project {
   owner       String // GitHub owner/org
   repo        String // GitHub repo name
   isApproved  Boolean @default(false)
-  tweetUrl    String? // URL of the X post mentioning @collab0rators
+  tweetUrl    String? // URL of the X post mentioning @collaborat0rs
 
   // Relationships
   projectAssignments ProjectAssignment[]
