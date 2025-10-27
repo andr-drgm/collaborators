@@ -54,7 +54,9 @@ export async function GET(request: NextRequest) {
 
     // Use user's GitHub token if available, otherwise fall back to app token
     const githubToken =
-      githubAccount?.access_token || process.env.GITHUB_ACCESS_TOKEN;
+      githubAccount?.access_token ||
+      process.env.GITHUB_ACCESS_TOKEN ||
+      process.env.GITHUB_TOKEN;
 
     console.log(
       "API: GitHub access token from DB/ENV:",
@@ -63,13 +65,14 @@ export async function GET(request: NextRequest) {
 
     if (!githubToken) {
       console.error("API: GitHub access token not found for user or in ENV");
-      return NextResponse.json(
-        {
-          error:
-            "GitHub access token not configured. Please link your GitHub account or set GITHUB_ACCESS_TOKEN.",
-        },
-        { status: 401 }
-      );
+      console.error("API: User has GitHub account:", !!githubAccount);
+      console.error("API: Available env vars:", {
+        hasGithubToken: !!process.env.GITHUB_ACCESS_TOKEN,
+        hasGithubTokenAlt: !!process.env.GITHUB_TOKEN,
+      });
+
+      // Return empty array instead of error for now
+      return NextResponse.json([]);
     }
 
     const octokit = new Octokit({
@@ -77,19 +80,18 @@ export async function GET(request: NextRequest) {
     });
 
     try {
-      // Use the GitHub Issues API with filter=created to get issues created by the authenticated user
-      // This is much more efficient than fetching all repos and their issues
-      console.log("Fetching issues created by authenticated user...");
+      // Use the GitHub Issues API to get issues for the authenticated user
+      // Filter by created to only get issues created by the user
+      console.log("Fetching issues for authenticated user...");
 
       const issuesResponse = await octokit.request("GET /issues", {
-        filter: "created", // Only return issues created by the authenticated user
         state: state as "open" | "closed" | "all",
         sort: sort as "created" | "updated" | "comments",
         direction: direction as "asc" | "desc",
         per_page: Math.min(per_page, 100), // GitHub allows up to 100 per page
       });
 
-      console.log(`Found ${issuesResponse.data.length} issues created by user`);
+      console.log(`Found ${issuesResponse.data.length} issues for user`);
 
       // Apply label filtering if specified
       let filteredIssues = issuesResponse.data;

@@ -33,6 +33,8 @@ In your Privy dashboard:
    - Go to Settings → Login Methods → GitHub
    - Add your GitHub OAuth app credentials
    - Set redirect URI to: `https://auth.privy.io/api/v1/oauth/github/callback`
+   - **IMPORTANT**: Enable "Return OAuth tokens" in the Privy dashboard so that GitHub access tokens are available to your application
+   - This is required for GitHub API calls to work properly
 
 3. **Configure Embedded Wallets:**
 
@@ -172,6 +174,13 @@ The following changes were made:
 - Ensure GitHub OAuth is enabled in Privy dashboard
 - Check redirect URIs are correctly configured
 - Verify GitHub OAuth app settings
+
+### GitHub API calls returning 404 or empty data
+
+- **You must enable "Return OAuth tokens" in your Privy dashboard** (Settings → Login Methods → GitHub)
+- Without this setting, Privy won't return GitHub access tokens to your application
+- GitHub issues and other API calls will return empty data or fail without the OAuth tokens
+- You can also set a `GITHUB_TOKEN` or `GITHUB_ACCESS_TOKEN` environment variable as a fallback
 
 ### Wallet not showing
 
