@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { searchGitHubIssues, getUserIssues } from "@/services/github";
 import { usePrivyAuth } from "@/hooks/usePrivyAuth";
+import BotInstallationStatus from "@/components/BotInstallationStatus";
 
 interface GitHubIssue {
   id: number;
@@ -41,11 +42,20 @@ interface Bounty {
   description: string;
   bountyAmount: number;
   status: string;
+  isSolved: boolean;
+  solvedAt: string | null;
+  solvedBy: string | null;
   githubIssueUrl: string;
   bountyPoster: {
     name: string;
     username: string;
     image: string;
+  };
+  solver?: {
+    id: string;
+    name: string | null;
+    username: string | null;
+    image: string | null;
   };
   createdAt: string;
 }
@@ -338,6 +348,12 @@ export default function BountyMarketplace() {
     }
   };
 
+  const extractPrNumberFromUrl = (url: string): number | null => {
+    // Extract PR number from GitHub URL like: https://github.com/owner/repo/pull/123
+    const match = url.match(/\/pull\/(\d+)/);
+    return match ? parseInt(match[1]) : null;
+  };
+
   const submitSolution = async (
     bountyId: string,
     prUrl: string,
@@ -460,71 +476,91 @@ export default function BountyMarketplace() {
     }
   };
 
-  const renderIssueCard = (issue: GitHubIssue, showAddBounty = true) => (
-    <div key={issue.id} className="glass-card rounded-xl p-4">
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="font-semibold text-lg">{issue.title}</h3>
-        <span className="text-sm text-white/60">#{issue.number}</span>
-      </div>
-      <p className="text-white/70 text-sm mb-3 line-clamp-2">
-        {issue.body?.substring(0, 150)}...
-      </p>
+  const renderIssueCard = (issue: GitHubIssue, showAddBounty = true) => {
+    const repoOwner =
+      issue.repository?.owner?.login ||
+      (issue.repository_url
+        ? issue.repository_url.split("/").slice(-2, -1)[0]
+        : null);
+    const repoName =
+      issue.repository?.name ||
+      (issue.repository_url
+        ? issue.repository_url.split("/").slice(-1)[0]
+        : null);
 
-      {/* Labels */}
-      {issue.labels.length > 0 && (
-        <div className="flex flex-wrap gap-1 mb-3">
-          {issue.labels.map((label) => (
-            <span
-              key={label.name}
-              className="text-xs px-2 py-1 rounded"
-              style={{
-                backgroundColor: `#${label.color}20`,
-                color: `#${label.color}`,
-                border: `1px solid #${label.color}40`,
-              }}
-            >
-              {label.name}
+    return (
+      <div key={issue.id} className="glass-card rounded-xl p-4">
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="font-semibold text-lg">{issue.title}</h3>
+          <span className="text-sm text-white/60">#{issue.number}</span>
+        </div>
+        <p className="text-white/70 text-sm mb-3 line-clamp-2">
+          {issue.body?.substring(0, 150)}...
+        </p>
+
+        {/* Labels */}
+        {issue.labels.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {issue.labels.map((label) => (
+              <span
+                key={label.name}
+                className="text-xs px-2 py-1 rounded"
+                style={{
+                  backgroundColor: `#${label.color}20`,
+                  color: `#${label.color}`,
+                  border: `1px solid #${label.color}40`,
+                }}
+              >
+                {label.name}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Bot Installation Status for Maintainers */}
+        {authenticated && repoOwner && repoName && (
+          <div className="mb-3 pb-3 border-b border-white/10">
+            <BotInstallationStatus owner={repoOwner} repo={repoName} />
+          </div>
+        )}
+
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-white/60">
+              {issue.repository?.full_name ||
+                (issue.repository_url
+                  ? issue.repository_url.split("/").slice(-2).join("/")
+                  : "Unknown Repository")}
             </span>
-          ))}
-        </div>
-      )}
-
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-white/60">
-            {issue.repository?.full_name ||
-              (issue.repository_url
-                ? issue.repository_url.split("/").slice(-2).join("/")
-                : "Unknown Repository")}
-          </span>
-          <span className="text-xs px-2 py-1 bg-white/10 rounded">
-            {issue.state}
-          </span>
-        </div>
-        <div className="flex gap-2">
-          <a
-            href={issue.html_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-secondary px-3 py-1 text-sm"
-          >
-            View Issue
-          </a>
-          {showAddBounty && (
-            <button
-              onClick={() => {
-                setSelectedIssue(issue);
-                setShowCreateBounty(true);
-              }}
-              className="btn-primary px-3 py-1 text-sm"
+            <span className="text-xs px-2 py-1 bg-white/10 rounded">
+              {issue.state}
+            </span>
+          </div>
+          <div className="flex gap-2">
+            <a
+              href={issue.html_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-secondary px-3 py-1 text-sm"
             >
-              Add Bounty
-            </button>
-          )}
+              View Issue
+            </a>
+            {showAddBounty && (
+              <button
+                onClick={() => {
+                  setSelectedIssue(issue);
+                  setShowCreateBounty(true);
+                }}
+                className="btn-primary px-3 py-1 text-sm"
+              >
+                Add Bounty
+              </button>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderBountyCard = (bounty: Bounty, showManageButtons = false) => (
     <div key={bounty.id} className="glass-card rounded-xl p-4">
@@ -540,6 +576,37 @@ export default function BountyMarketplace() {
       <p className="text-white/70 text-sm mb-3 line-clamp-2">
         {bounty.description.substring(0, 150)}...
       </p>
+
+      {/* Show who solved it */}
+      {bounty.status === "SOLVED" && bounty.solver && (
+        <div className="mb-3 pb-3 border-b border-white/10">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-white/60">Solved by:</span>
+            {bounty.solver.image && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={bounty.solver.image}
+                alt={bounty.solver.name || "Solver"}
+                className="w-5 h-5 rounded-full"
+              />
+            )}
+            <span className="text-blue-400 font-medium">
+              {bounty.solver.name || bounty.solver.username || "Anonymous"}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Bot Installation Status */}
+      {authenticated && (
+        <div className="mb-3 pb-3 border-b border-white/10">
+          <BotInstallationStatus
+            owner={bounty.githubRepoOwner}
+            repo={bounty.githubRepoName}
+          />
+        </div>
+      )}
+
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <span className="text-sm text-white/60">
@@ -574,9 +641,15 @@ export default function BountyMarketplace() {
             <button
               onClick={() => {
                 const prUrl = prompt("Enter your PR URL:");
-                const prNumber = prompt("Enter PR number:");
-                if (prUrl && prNumber) {
-                  submitSolution(bounty.id, prUrl, parseInt(prNumber));
+                if (prUrl) {
+                  const prNumber = extractPrNumberFromUrl(prUrl);
+                  if (prNumber) {
+                    submitSolution(bounty.id, prUrl, prNumber);
+                  } else {
+                    alert(
+                      "Invalid PR URL. Please enter a valid GitHub PR URL (e.g., https://github.com/owner/repo/pull/123)"
+                    );
+                  }
                 }
               }}
               className="btn-primary px-3 py-1 text-sm"

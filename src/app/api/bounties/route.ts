@@ -40,7 +40,29 @@ export async function GET(request: NextRequest) {
       skip: offset,
     });
 
-    return NextResponse.json(bounties);
+    // For solved bounties, add solver information
+    const bountiesWithSolvers = await Promise.all(
+      bounties.map(async (bounty) => {
+        if (bounty.status === "SOLVED" && bounty.solvedBy) {
+          const solver = await prisma.user.findUnique({
+            where: { id: bounty.solvedBy },
+            select: {
+              id: true,
+              name: true,
+              username: true,
+              image: true,
+            },
+          });
+          return {
+            ...bounty,
+            solver,
+          };
+        }
+        return bounty;
+      })
+    );
+
+    return NextResponse.json(bountiesWithSolvers);
   } catch (error) {
     console.error("Error fetching bounties:", error);
     return NextResponse.json(
