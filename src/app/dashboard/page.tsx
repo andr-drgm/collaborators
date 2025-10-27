@@ -5,6 +5,7 @@ import WalletConnect from "@/components/dashboard/WalletConnect";
 import BotInstallationStatus from "@/components/BotInstallationStatus";
 import { useState, useEffect, useCallback } from "react";
 import { usePrivy } from "@privy-io/react-auth";
+import { useRouter } from "next/navigation";
 import { searchGitHubIssues, getUserIssues } from "@/services/github";
 import { usePrivyAuth } from "@/hooks/usePrivyAuth";
 
@@ -65,7 +66,8 @@ interface Bounty {
 type TabType = "search" | "my-issues" | "bounties" | "my-bounties";
 
 export default function Dashboard() {
-  const { authenticated, getAccessToken } = usePrivy();
+  const router = useRouter();
+  const { authenticated, getAccessToken, logout } = usePrivy();
   const { getGithubAccessToken, userData } = usePrivyAuth();
 
   // State for storing GitHub access token
@@ -116,6 +118,10 @@ export default function Dashboard() {
   const [editingBounty, setEditingBounty] = useState<Bounty | null>(null);
   const [editBountyAmount, setEditBountyAmount] = useState("");
   const [showEditBountyModal, setShowEditBountyModal] = useState(false);
+
+  // Webhook installation banner state
+  const [isWebhookSectionExpanded, setIsWebhookSectionExpanded] =
+    useState(false);
 
   const loadBounties = useCallback(async () => {
     try {
@@ -202,6 +208,13 @@ export default function Dashboard() {
       setMyBountiesLoading(false);
     }
   }, [authenticated, myBountyFilters, getAccessToken]);
+
+  // Redirect to main page if not authenticated
+  useEffect(() => {
+    if (authenticated === false) {
+      router.push("/");
+    }
+  }, [authenticated, router]);
 
   // Load bounties
   useEffect(() => {
@@ -468,6 +481,11 @@ export default function Dashboard() {
     }
   };
 
+  const handleLogout = async () => {
+    logout();
+    router.push("/");
+  };
+
   const renderIssueCard = (issue: GitHubIssue, showAddBounty = true) => {
     const repoOwner =
       issue.repository?.owner?.login ||
@@ -657,6 +675,17 @@ export default function Dashboard() {
     ? new Date(userData.createdAt).toLocaleDateString()
     : undefined;
 
+  // Show loading state while checking authentication
+  if (authenticated === false) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white/70">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white p-8 relative overflow-hidden">
       {/* Background gradient elements */}
@@ -669,7 +698,17 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex justify-between items-start mb-8">
           <h1 className="text-5xl font-bold gradient-text">Dashboard</h1>
-          <WalletConnect />
+          <div className="flex items-center gap-4">
+            <WalletConnect />
+            {authenticated && (
+              <button
+                onClick={handleLogout}
+                className="btn-secondary px-4 py-2 text-sm"
+              >
+                Logout
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Profile Card */}
@@ -681,6 +720,153 @@ export default function Dashboard() {
           memberSince={memberSince}
           className="mb-12"
         />
+
+        {/* GitHub Installation Banner */}
+        <div className="glass-card rounded-2xl mb-8 border-l-4 border-l-blue-500">
+          <div className="p-6">
+            <button
+              onClick={() =>
+                setIsWebhookSectionExpanded(!isWebhookSectionExpanded)
+              }
+              className="flex items-center justify-between w-full text-left"
+            >
+              <h3 className="text-xl font-semibold flex items-center gap-2">
+                <svg
+                  className="w-6 h-6 text-blue-400"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Set Up GitHub Webhooks
+              </h3>
+              <svg
+                className={`w-5 h-5 text-white/70 transform transition-transform ${
+                  isWebhookSectionExpanded ? "rotate-180" : ""
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <p className="text-white/80 mt-2">
+              Set up webhooks in your GitHub repositories to enable automatic
+              bounty tracking.
+            </p>
+          </div>
+
+          {isWebhookSectionExpanded && (
+            <div className="px-6 pb-6 border-t border-white/10 pt-6">
+              <div className="flex items-start justify-between gap-6">
+                <div className="flex-1">
+                  <div className="bg-white/5 rounded-lg p-4 mb-4">
+                    <h4 className="font-semibold mb-4 text-white">
+                      Installation Steps:
+                    </h4>
+                    <ol className="space-y-3 text-white/80">
+                      <li className="flex gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold">
+                          1
+                        </span>
+                        <div>
+                          Go to your repository settings:{" "}
+                          <a
+                            href="https://github.com/settings"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:text-blue-300 underline"
+                          >
+                            github.com/settings
+                          </a>
+                        </div>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold">
+                          2
+                        </span>
+                        <div>
+                          Navigate to{" "}
+                          <span className="font-mono text-sm bg-white/10 px-2 py-1 rounded">
+                            Settings → Webhooks → Add webhook
+                          </span>
+                        </div>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold">
+                          3
+                        </span>
+                        <div>
+                          Set the Payload URL to:{" "}
+                          <span className="font-mono text-sm bg-white/10 px-2 py-1 rounded break-all">
+                            {typeof window !== "undefined"
+                              ? window.location.origin
+                              : "https://collab0rators.com"}
+                            /api/github/webhook
+                          </span>
+                        </div>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold">
+                          4
+                        </span>
+                        <div>
+                          Set Content type to{" "}
+                          <span className="font-mono text-sm bg-white/10 px-2 py-1 rounded">
+                            application/json
+                          </span>
+                        </div>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold">
+                          5
+                        </span>
+                        <div>
+                          Select the following events:{" "}
+                          <span className="font-mono text-sm bg-white/10 px-2 py-1 rounded">
+                            Issues
+                          </span>{" "}
+                          and{" "}
+                          <span className="font-mono text-sm bg-white/10 px-2 py-1 rounded">
+                            Pull requests
+                          </span>
+                        </div>
+                      </li>
+                      <li className="flex gap-3">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-semibold">
+                          6
+                        </span>
+                        <div>
+                          Add a webhook secret (optional but recommended) and
+                          click{" "}
+                          <span className="font-mono text-sm bg-white/10 px-2 py-1 rounded">
+                            Add webhook
+                          </span>
+                        </div>
+                      </li>
+                    </ol>
+                  </div>
+                  <ul className="list-disc list-inside space-y-1 text-white/70 text-sm ml-2">
+                    <li>Automatically track when issues are closed by PRs</li>
+                    <li>Verify bounty solutions and release payments</li>
+                    <li>Get notifications when solutions are submitted</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Tabs */}
         <div className="flex gap-1 mb-8 bg-white/5 p-1 rounded-lg">
