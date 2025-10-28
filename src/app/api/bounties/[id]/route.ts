@@ -111,7 +111,23 @@ export async function PUT(
       },
     });
 
-    return NextResponse.json(updatedBounty);
+    // Add solver information if the bounty is solved
+    let bountyWithSolver = updatedBounty;
+    if (updatedBounty.status === "SOLVED" && updatedBounty.solvedBy) {
+      const solver = await prisma.user.findUnique({
+        where: { id: updatedBounty.solvedBy },
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          image: true,
+          walletAddress: true,
+        },
+      });
+      bountyWithSolver = { ...updatedBounty, solver };
+    }
+
+    return NextResponse.json(bountyWithSolver);
   } catch (error) {
     console.error("Error updating bounty:", error);
     return NextResponse.json(

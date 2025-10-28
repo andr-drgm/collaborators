@@ -59,6 +59,7 @@ interface Bounty {
     name: string | null;
     username: string | null;
     image: string | null;
+    walletAddress: string | null;
   };
   createdAt: string;
 }
@@ -587,19 +588,52 @@ export default function Dashboard() {
 
       {bounty.status === "SOLVED" && bounty.solver && (
         <div className="mb-3 pb-3 border-b border-white/10">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-white/60">Solved by:</span>
-            {bounty.solver.image && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={bounty.solver.image}
-                alt={bounty.solver.name || "Solver"}
-                className="w-5 h-5 rounded-full"
-              />
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-white/60">Solved by:</span>
+              {bounty.solver.image && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={bounty.solver.image}
+                  alt={bounty.solver.name || "Solver"}
+                  className="w-5 h-5 rounded-full"
+                />
+              )}
+              <span className="text-blue-400 font-medium">
+                {bounty.solver.name || bounty.solver.username || "Anonymous"}
+              </span>
+            </div>
+            {bounty.solver.username && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-white/60">GitHub:</span>
+                <a
+                  href={`https://github.com/${bounty.solver.username}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 hover:underline"
+                >
+                  @{bounty.solver.username}
+                </a>
+              </div>
             )}
-            <span className="text-blue-400 font-medium">
-              {bounty.solver.name || bounty.solver.username || "Anonymous"}
-            </span>
+            {bounty.solver.walletAddress && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-white/60">Wallet:</span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      bounty.solver!.walletAddress!
+                    );
+                    alert("Wallet address copied to clipboard!");
+                  }}
+                  className="text-green-400 font-mono hover:text-green-300 hover:underline cursor-pointer"
+                  title="Click to copy full address"
+                >
+                  {bounty.solver.walletAddress.slice(0, 6)}...
+                  {bounty.solver.walletAddress.slice(-4)}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
