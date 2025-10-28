@@ -2,7 +2,8 @@
 
 import ProfileCard from "@/components/dashboard/ProfileCard";
 import WalletConnect from "@/components/dashboard/WalletConnect";
-import BotInstallationStatus from "@/components/BotInstallationStatus";
+import IssueCard from "@/components/dashboard/IssueCard";
+import BountyCard from "@/components/dashboard/BountyCard";
 import { useState, useEffect, useCallback } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
@@ -77,12 +78,7 @@ type TabType = "bounties" | "my-issues" | "solved-issues" | "my-bounties";
 export default function Dashboard() {
   const router = useRouter();
   const { authenticated, getAccessToken, logout } = usePrivy();
-  const { getGithubAccessToken, userData } = usePrivyAuth();
-
-  // State for storing GitHub access token
-  const [githubAccessToken, setGithubAccessToken] = useState<string | null>(
-    null
-  );
+  const { userData } = usePrivyAuth();
 
   const [activeTab, setActiveTab] = useState<TabType>("bounties");
 
@@ -259,42 +255,6 @@ export default function Dashboard() {
     loadBounties();
   }, [loadBounties]);
 
-  // Try to get GitHub access token when component mounts
-  useEffect(() => {
-    const getToken = async () => {
-      if (authenticated && !githubAccessToken) {
-        const storedToken = localStorage.getItem("github_access_token");
-        if (storedToken) {
-          setGithubAccessToken(storedToken);
-          return;
-        }
-
-        try {
-          const token = await getGithubAccessToken();
-          if (token && typeof token === "string") {
-            setGithubAccessToken(token);
-          }
-        } catch (error) {
-          console.error("Error getting GitHub access token:", error);
-        }
-      }
-    };
-
-    getToken();
-
-    const handleTokenReceived = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      const { token } = customEvent.detail;
-      setGithubAccessToken(token);
-    };
-
-    window.addEventListener("github-token-received", handleTokenReceived);
-
-    return () => {
-      window.removeEventListener("github-token-received", handleTokenReceived);
-    };
-  }, [authenticated, githubAccessToken, getGithubAccessToken]);
-
   // Load user issues when switching to my-issues tab
   useEffect(() => {
     if (activeTab === "my-issues" && authenticated) {
@@ -386,56 +346,6 @@ export default function Dashboard() {
     }
   };
 
-  const extractPrNumberFromUrl = (url: string): number | null => {
-    const match = url.match(/\/pull\/(\d+)/);
-    return match ? parseInt(match[1]) : null;
-  };
-
-  const submitSolution = async (
-    bountyId: string,
-    prUrl: string,
-    prNumber: number
-  ) => {
-    if (!authenticated) return;
-
-    try {
-      const privyToken = await getAccessToken();
-      if (!privyToken) {
-        alert("No access token available. Please log in.");
-        return;
-      }
-
-      const response = await fetch("/api/bounties/submissions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${privyToken}`,
-        },
-        body: JSON.stringify({
-          bountyId,
-          prUrl,
-          prNumber,
-        }),
-      });
-
-      if (response.ok) {
-        alert("Solution submitted successfully!");
-      } else {
-        const error = await response.json();
-        alert(`Error: ${error.error}`);
-      }
-    } catch (error) {
-      console.error("Error submitting solution:", error);
-      alert("Failed to submit solution");
-    }
-  };
-
-  const handleEditBounty = (bounty: Bounty) => {
-    setEditingBounty(bounty);
-    setEditBountyAmount(bounty.bountyAmount.toString());
-    setShowEditBountyModal(true);
-  };
-
   const handleUpdateBounty = async () => {
     if (!editingBounty || !editBountyAmount) {
       alert("Please enter a valid bounty amount");
@@ -479,257 +389,129 @@ export default function Dashboard() {
     }
   };
 
-  const handleDeleteBounty = async (bountyId: string, bountyTitle: string) => {
-    if (
-      !confirm(
-        `Are you sure you want to delete the bounty "${bountyTitle}"? This action cannot be undone.`
-      )
-    ) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/bounties/${bountyId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${await getAccessToken()}`,
-        },
-      });
-
-      if (response.ok) {
-        setBounties((prev) => prev.filter((bounty) => bounty.id !== bountyId));
-        setMyBounties((prev) =>
-          prev.filter((bounty) => bounty.id !== bountyId)
-        );
-        alert("Bounty deleted successfully!");
-      } else {
-        const error = await response.json();
-        alert(`Error deleting bounty: ${error.error}`);
-      }
-    } catch (error) {
-      console.error("Error deleting bounty:", error);
-      alert("Failed to delete bounty");
-    }
-  };
-
-  const handleLogout = async () => {
-    logout();
+  const handleLogout = useCallback(async () => {
+    await logout();
     router.push("/");
-  };
+  }, [logout, router]);
 
-  const renderIssueCard = (issue: GitHubIssue, showAddBounty = true) => {
-    const repoOwner =
-      issue.repository?.owner?.login ||
-      (issue.repository_url
-        ? issue.repository_url.split("/").slice(-2, -1)[0]
-        : null);
-    const repoName =
-      issue.repository?.name ||
-      (issue.repository_url
-        ? issue.repository_url.split("/").slice(-1)[0]
-        : null);
+  // Memoized handlers with dependencies
+  const memoizedHandleAddBounty = useCallback((issue: GitHubIssue) => {
+    setSelectedIssue(issue);
+    setShowCreateBounty(true);
+  }, []);
 
-    return (
-      <div key={issue.id} className="glass-card rounded-xl p-4">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="font-semibold text-lg">{issue.title}</h3>
-          <span className="text-sm text-white/60">#{issue.number}</span>
-        </div>
-        <p className="text-white/70 text-sm mb-3 line-clamp-2">
-          {issue.body?.substring(0, 150)}...
-        </p>
+  const memoizedHandleEdit = useCallback((bounty: Bounty) => {
+    setEditingBounty(bounty);
+    setEditBountyAmount(bounty.bountyAmount.toString());
+    setShowEditBountyModal(true);
+  }, []);
 
-        {issue.labels.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-3">
-            {issue.labels.map((label) => (
-              <span
-                key={label.name}
-                className="text-xs px-2 py-1 rounded"
-                style={{
-                  backgroundColor: `#${label.color}20`,
-                  color: `#${label.color}`,
-                  border: `1px solid #${label.color}40`,
-                }}
-              >
-                {label.name}
-              </span>
-            ))}
-          </div>
-        )}
+  const memoizedHandleDelete = useCallback(
+    async (bountyId: string, bountyTitle: string) => {
+      if (
+        !confirm(
+          `Are you sure you want to delete the bounty "${bountyTitle}"? This action cannot be undone.`
+        )
+      ) {
+        return;
+      }
 
-        {authenticated && repoOwner && repoName && (
-          <div className="mb-3 pb-3 border-b border-white/10">
-            <BotInstallationStatus owner={repoOwner} repo={repoName} />
-          </div>
-        )}
+      try {
+        const response = await fetch(`/api/bounties/${bountyId}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${await getAccessToken()}`,
+          },
+        });
 
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-white/60">
-              {issue.repository?.full_name ||
-                (issue.repository_url
-                  ? issue.repository_url.split("/").slice(-2).join("/")
-                  : "Unknown Repository")}
-            </span>
-            <span className="text-xs px-2 py-1 bg-white/10 rounded">
-              {issue.state}
-            </span>
-          </div>
-          <div className="flex gap-2">
-            <a
-              href={issue.html_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary px-3 py-1 text-sm"
-            >
-              View Issue
-            </a>
-            {showAddBounty && (
-              <button
-                onClick={() => {
-                  setSelectedIssue(issue);
-                  setShowCreateBounty(true);
-                }}
-                className="btn-primary px-3 py-1 text-sm"
-              >
-                Add Bounty
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
+        if (response.ok) {
+          setBounties((prev) =>
+            prev.filter((bounty) => bounty.id !== bountyId)
+          );
+          setMyBounties((prev) =>
+            prev.filter((bounty) => bounty.id !== bountyId)
+          );
+          alert("Bounty deleted successfully!");
+        } else {
+          const error = await response.json();
+          alert(`Error deleting bounty: ${error.error}`);
+        }
+      } catch (error) {
+        console.error("Error deleting bounty:", error);
+        alert("Failed to delete bounty");
+      }
+    },
+    [getAccessToken]
+  );
 
-  const renderBountyCard = (bounty: Bounty, showManageButtons = false) => (
-    <div key={bounty.id} className="glass-card rounded-xl p-4">
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="font-semibold text-lg">{bounty.title}</h3>
-        <div className="text-right">
-          <div className="text-lg font-bold text-green-400">
-            ${bounty.bountyAmount} USDC
-          </div>
-          <div className="text-xs text-white/60">{bounty.status}</div>
-        </div>
-      </div>
-      <p className="text-white/70 text-sm mb-3 line-clamp-2">
-        {bounty.description.substring(0, 150)}...
-      </p>
+  const memoizedHandleSubmitSolution = useCallback(
+    async (bountyId: string, prUrl: string, prNumber: number) => {
+      if (!authenticated) return;
 
-      {bounty.status === "SOLVED" && bounty.solver && (
-        <div className="mb-3 pb-3 border-b border-white/10">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-white/60">Solved by:</span>
-              {bounty.solver.image && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={bounty.solver.image}
-                  alt={bounty.solver.name || "Solver"}
-                  className="w-5 h-5 rounded-full"
-                />
-              )}
-              <span className="text-blue-400 font-medium">
-                {bounty.solver.name || bounty.solver.username || "Anonymous"}
-              </span>
-            </div>
-            {bounty.solver.username && (
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-white/60">GitHub:</span>
-                <a
-                  href={`https://github.com/${bounty.solver.username}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 hover:underline"
-                >
-                  @{bounty.solver.username}
-                </a>
-              </div>
-            )}
-            {bounty.solver.walletAddress && (
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-white/60">Wallet:</span>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(
-                      bounty.solver!.walletAddress!
-                    );
-                    alert("Wallet address copied to clipboard!");
-                  }}
-                  className="text-green-400 font-mono hover:text-green-300 hover:underline cursor-pointer"
-                  title="Click to copy full address"
-                >
-                  {bounty.solver.walletAddress.slice(0, 6)}...
-                  {bounty.solver.walletAddress.slice(-4)}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      try {
+        const privyToken = await getAccessToken();
+        if (!privyToken) {
+          alert("No access token available. Please log in.");
+          return;
+        }
 
-      {authenticated && (
-        <div className="mb-3 pb-3 border-b border-white/10">
-          <BotInstallationStatus
-            owner={bounty.githubRepoOwner}
-            repo={bounty.githubRepoName}
-          />
-        </div>
-      )}
+        const response = await fetch("/api/bounties/submissions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${privyToken}`,
+          },
+          body: JSON.stringify({
+            bountyId,
+            prUrl,
+            prNumber,
+          }),
+        });
 
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-white/60">
-            {bounty.githubRepoOwner}/{bounty.githubRepoName}
-          </span>
-        </div>
-        <div className="flex gap-2">
-          <a
-            href={bounty.githubIssueUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-secondary px-3 py-1 text-sm"
-          >
-            View Issue
-          </a>
-          {showManageButtons && bounty.status === "ACTIVE" ? (
-            <>
-              <button
-                onClick={() => handleEditBounty(bounty)}
-                className="btn-primary px-3 py-1 text-sm"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleDeleteBounty(bounty.id, bounty.title)}
-                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-sm rounded-lg transition-colors"
-              >
-                Delete
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={() => {
-                const prUrl = prompt("Enter your PR URL:");
-                if (prUrl) {
-                  const prNumber = extractPrNumberFromUrl(prUrl);
-                  if (prNumber) {
-                    submitSolution(bounty.id, prUrl, prNumber);
-                  } else {
-                    alert(
-                      "Invalid PR URL. Please enter a valid GitHub PR URL (e.g., https://github.com/owner/repo/pull/123)"
-                    );
-                  }
-                }
-              }}
-              className="btn-primary px-3 py-1 text-sm"
-            >
-              Submit Solution
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+        if (response.ok) {
+          alert("Solution submitted successfully!");
+        } else {
+          const error = await response.json();
+          alert(`Error: ${error.error}`);
+        }
+      } catch (error) {
+        console.error("Error submitting solution:", error);
+        alert("Failed to submit solution");
+      }
+    },
+    [authenticated, getAccessToken]
+  );
+
+  const renderIssueCard = useCallback(
+    (issue: GitHubIssue) => (
+      <IssueCard
+        key={issue.id}
+        issue={issue}
+        authenticated={authenticated}
+        onAddBounty={memoizedHandleAddBounty}
+      />
+    ),
+    [authenticated, memoizedHandleAddBounty]
+  );
+
+  const renderBountyCard = useCallback(
+    (bounty: Bounty, showManageButtons = false) => (
+      <BountyCard
+        key={bounty.id}
+        bounty={bounty}
+        showManageButtons={showManageButtons}
+        authenticated={authenticated}
+        onEdit={memoizedHandleEdit}
+        onDelete={memoizedHandleDelete}
+        onSubmitSolution={memoizedHandleSubmitSolution}
+      />
+    ),
+    [
+      authenticated,
+      memoizedHandleEdit,
+      memoizedHandleDelete,
+      memoizedHandleSubmitSolution,
+    ]
   );
 
   // Get user info for profile card from database

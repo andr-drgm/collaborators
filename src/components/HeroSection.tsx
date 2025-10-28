@@ -2,13 +2,17 @@
 
 import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, memo, useCallback } from "react";
 import Image from "next/image";
 import RippleGrid from "./ui/RippleGrid";
 
-export default function HeroSection() {
+const HeroSection = memo(function HeroSection() {
   const { login, authenticated } = usePrivy();
   const router = useRouter();
+
+  const handleLogin = useCallback(() => {
+    login();
+  }, [login]);
 
   useEffect(() => {
     if (authenticated) {
@@ -123,7 +127,7 @@ export default function HeroSection() {
           {/* CTA Button */}
           <div className="w-full max-w-xs">
             <button
-              onClick={login}
+              onClick={handleLogin}
               className="btn-primary w-full py-4 text-lg flex items-center justify-center gap-3 group"
             >
               <svg
@@ -153,4 +157,8 @@ export default function HeroSection() {
       </div>
     </section>
   );
-}
+});
+
+HeroSection.displayName = "HeroSection";
+
+export default HeroSection;
