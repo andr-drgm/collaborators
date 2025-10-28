@@ -6,7 +6,7 @@ import BotInstallationStatus from "@/components/BotInstallationStatus";
 import { useState, useEffect, useCallback } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useRouter } from "next/navigation";
-import { searchGitHubIssues, getUserIssues } from "@/services/github";
+import { getUserIssues } from "@/services/github";
 import { usePrivyAuth } from "@/hooks/usePrivyAuth";
 
 interface GitHubIssue {
@@ -59,11 +59,20 @@ interface Bounty {
     name: string | null;
     username: string | null;
     image: string | null;
+    walletAddress: string | null;
   };
   createdAt: string;
 }
 
-type TabType = "search" | "my-issues" | "bounties" | "my-bounties";
+interface SolvedBounty extends Bounty {
+  submissionId?: string;
+  prUrl?: string;
+  prNumber?: number;
+  submissionStatus?: string;
+  submissionCreatedAt?: string;
+}
+
+type TabType = "bounties" | "my-issues" | "solved-issues" | "my-bounties";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -76,11 +85,6 @@ export default function Dashboard() {
   );
 
   const [activeTab, setActiveTab] = useState<TabType>("bounties");
-
-  // Search tab state
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchIssues, setSearchIssues] = useState<GitHubIssue[]>([]);
-  const [searchLoading, setSearchLoading] = useState(false);
 
   // My issues tab state
   const [myIssues, setMyIssues] = useState<GitHubIssue[]>([]);
@@ -108,6 +112,10 @@ export default function Dashboard() {
     sort: "created" as "created" | "amount",
     direction: "desc" as "asc" | "desc",
   });
+
+  // Solved issues tab state
+  const [solvedBounties, setSolvedBounties] = useState<SolvedBounty[]>([]);
+  const [solvedBountiesLoading, setSolvedBountiesLoading] = useState(false);
 
   // Common state
   const [selectedIssue, setSelectedIssue] = useState<GitHubIssue | null>(null);
@@ -209,6 +217,36 @@ export default function Dashboard() {
     }
   }, [authenticated, myBountyFilters, getAccessToken]);
 
+  const loadSolvedBounties = useCallback(async () => {
+    if (!authenticated) return;
+
+    setSolvedBountiesLoading(true);
+    try {
+      const privyToken = await getAccessToken();
+      if (!privyToken) {
+        console.error("No Privy access token available. Please log in.");
+        return;
+      }
+
+      const response = await fetch("/api/bounties/solved", {
+        headers: {
+          Authorization: `Bearer ${privyToken}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSolvedBounties(data);
+      } else {
+        console.error("Failed to load solved bounties");
+      }
+    } catch (error) {
+      console.error("Error loading solved bounties:", error);
+    } finally {
+      setSolvedBountiesLoading(false);
+    }
+  }, [authenticated, getAccessToken]);
+
   // Redirect to main page if not authenticated
   useEffect(() => {
     if (authenticated === false) {
@@ -271,19 +309,12 @@ export default function Dashboard() {
     }
   }, [activeTab, authenticated, loadMyBounties]);
 
-  const performSearch = async () => {
-    if (!searchQuery.trim()) return;
-
-    setSearchLoading(true);
-    try {
-      const results = await searchGitHubIssues(searchQuery);
-      setSearchIssues(results);
-    } catch (error) {
-      console.error("Error searching issues:", error);
-    } finally {
-      setSearchLoading(false);
+  // Load solved bounties when switching to solved-issues tab
+  useEffect(() => {
+    if (activeTab === "solved-issues" && authenticated) {
+      loadSolvedBounties();
     }
-  };
+  }, [activeTab, authenticated, loadSolvedBounties]);
 
   const createBounty = async () => {
     if (!selectedIssue || !bountyAmount || !authenticated) return;
@@ -587,19 +618,52 @@ export default function Dashboard() {
 
       {bounty.status === "SOLVED" && bounty.solver && (
         <div className="mb-3 pb-3 border-b border-white/10">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-white/60">Solved by:</span>
-            {bounty.solver.image && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={bounty.solver.image}
-                alt={bounty.solver.name || "Solver"}
-                className="w-5 h-5 rounded-full"
-              />
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-white/60">Solved by:</span>
+              {bounty.solver.image && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={bounty.solver.image}
+                  alt={bounty.solver.name || "Solver"}
+                  className="w-5 h-5 rounded-full"
+                />
+              )}
+              <span className="text-blue-400 font-medium">
+                {bounty.solver.name || bounty.solver.username || "Anonymous"}
+              </span>
+            </div>
+            {bounty.solver.username && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-white/60">GitHub:</span>
+                <a
+                  href={`https://github.com/${bounty.solver.username}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 hover:underline"
+                >
+                  @{bounty.solver.username}
+                </a>
+              </div>
             )}
-            <span className="text-blue-400 font-medium">
-              {bounty.solver.name || bounty.solver.username || "Anonymous"}
-            </span>
+            {bounty.solver.walletAddress && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="text-white/60">Wallet:</span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      bounty.solver!.walletAddress!
+                    );
+                    alert("Wallet address copied to clipboard!");
+                  }}
+                  className="text-green-400 font-mono hover:text-green-300 hover:underline cursor-pointer"
+                  title="Click to copy full address"
+                >
+                  {bounty.solver.walletAddress.slice(0, 6)}...
+                  {bounty.solver.walletAddress.slice(-4)}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -871,14 +935,14 @@ export default function Dashboard() {
         {/* Tabs */}
         <div className="flex gap-1 mb-8 bg-white/5 p-1 rounded-lg">
           <button
-            onClick={() => setActiveTab("search")}
+            onClick={() => setActiveTab("bounties")}
             className={`px-4 py-2 rounded-md transition-colors ${
-              activeTab === "search"
+              activeTab === "bounties"
                 ? "bg-white/10 text-white"
                 : "text-white/70 hover:text-white hover:bg-white/5"
             }`}
           >
-            Search Issues
+            Bounties
           </button>
           <button
             onClick={() => setActiveTab("my-issues")}
@@ -891,14 +955,14 @@ export default function Dashboard() {
             My Issues
           </button>
           <button
-            onClick={() => setActiveTab("bounties")}
+            onClick={() => setActiveTab("solved-issues")}
             className={`px-4 py-2 rounded-md transition-colors ${
-              activeTab === "bounties"
+              activeTab === "solved-issues"
                 ? "bg-white/10 text-white"
                 : "text-white/70 hover:text-white hover:bg-white/5"
             }`}
           >
-            Active Bounties
+            Solved Issues
           </button>
           <button
             onClick={() => setActiveTab("my-bounties")}
@@ -912,34 +976,69 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* Search Tab */}
-        {activeTab === "search" && (
+        {/* Bounties Tab */}
+        {activeTab === "bounties" && (
           <div className="space-y-6">
             <div className="glass-card rounded-2xl p-6">
-              <h2 className="text-2xl font-semibold mb-4">
-                Search GitHub Issues
-              </h2>
-              <div className="flex gap-4">
-                <input
-                  type="text"
-                  placeholder="Search for issues (e.g., 'bug', 'feature', 'help wanted')"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500"
-                  onKeyPress={(e) => e.key === "Enter" && performSearch()}
-                />
-                <button
-                  onClick={performSearch}
-                  disabled={searchLoading}
-                  className="btn-primary px-6 py-2 disabled:opacity-50"
+              <h2 className="text-2xl font-semibold mb-2">Active Bounties</h2>
+              <p className="text-white/70 text-sm mb-4">
+                Browse all available bounties. Find issues you can solve and
+                earn USDC rewards.
+              </p>
+
+              <div className="grid grid-cols-3 gap-4">
+                <select
+                  value={bountyFilters.status}
+                  onChange={(e) =>
+                    setBountyFilters((prev) => ({
+                      ...prev,
+                      status: e.target.value as
+                        | "ACTIVE"
+                        | "SOLVED"
+                        | "EXPIRED"
+                        | "CANCELLED",
+                    }))
+                  }
+                  className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500"
                 >
-                  {searchLoading ? "Searching..." : "Search"}
-                </button>
+                  <option value="ACTIVE">Active</option>
+                  <option value="SOLVED">Solved</option>
+                  <option value="EXPIRED">Expired</option>
+                  <option value="CANCELLED">Cancelled</option>
+                </select>
+
+                <select
+                  value={bountyFilters.sort}
+                  onChange={(e) =>
+                    setBountyFilters((prev) => ({
+                      ...prev,
+                      sort: e.target.value as "created" | "amount",
+                    }))
+                  }
+                  className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500"
+                >
+                  <option value="created">Recently Created</option>
+                  <option value="amount">Bounty Amount</option>
+                </select>
+
+                <select
+                  value={bountyFilters.direction}
+                  onChange={(e) =>
+                    setBountyFilters((prev) => ({
+                      ...prev,
+                      direction: e.target.value as "asc" | "desc",
+                    }))
+                  }
+                  className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500"
+                >
+                  <option value="desc">Descending</option>
+                  <option value="asc">Ascending</option>
+                </select>
               </div>
             </div>
 
             <div className="space-y-4">
-              {searchIssues.map((issue) => renderIssueCard(issue))}
+              {bounties.map((bounty) => renderBountyCard(bounty))}
             </div>
           </div>
         )}
@@ -948,7 +1047,11 @@ export default function Dashboard() {
         {activeTab === "my-issues" && (
           <div className="space-y-6">
             <div className="glass-card rounded-2xl p-6">
-              <h2 className="text-2xl font-semibold mb-4">My GitHub Issues</h2>
+              <h2 className="text-2xl font-semibold mb-2">My Issues</h2>
+              <p className="text-white/70 text-sm mb-4">
+                View all GitHub issues you&apos;ve opened. Monitor their status
+                and see if anyone has added bounties.
+              </p>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                 <select
@@ -1022,6 +1125,12 @@ export default function Dashboard() {
             <div className="space-y-4">
               {myIssuesLoading ? (
                 <div className="text-center py-8">Loading your issues...</div>
+              ) : myIssues.length === 0 ? (
+                <div className="text-center py-8 text-white/70">
+                  {authenticated
+                    ? "You haven't created any issues yet."
+                    : "Please log in to view your issues."}
+                </div>
               ) : (
                 myIssues.map((issue) => renderIssueCard(issue))
               )}
@@ -1029,65 +1138,82 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Bounties Tab */}
-        {activeTab === "bounties" && (
+        {/* Solved Issues Tab */}
+        {activeTab === "solved-issues" && (
           <div className="space-y-6">
             <div className="glass-card rounded-2xl p-6">
-              <h2 className="text-2xl font-semibold mb-4">Active Bounties</h2>
-
-              <div className="grid grid-cols-3 gap-4">
-                <select
-                  value={bountyFilters.status}
-                  onChange={(e) =>
-                    setBountyFilters((prev) => ({
-                      ...prev,
-                      status: e.target.value as
-                        | "ACTIVE"
-                        | "SOLVED"
-                        | "EXPIRED"
-                        | "CANCELLED",
-                    }))
-                  }
-                  className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500"
-                >
-                  <option value="ACTIVE">Active</option>
-                  <option value="SOLVED">Solved</option>
-                  <option value="EXPIRED">Expired</option>
-                  <option value="CANCELLED">Cancelled</option>
-                </select>
-
-                <select
-                  value={bountyFilters.sort}
-                  onChange={(e) =>
-                    setBountyFilters((prev) => ({
-                      ...prev,
-                      sort: e.target.value as "created" | "amount",
-                    }))
-                  }
-                  className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500"
-                >
-                  <option value="created">Recently Created</option>
-                  <option value="amount">Bounty Amount</option>
-                </select>
-
-                <select
-                  value={bountyFilters.direction}
-                  onChange={(e) =>
-                    setBountyFilters((prev) => ({
-                      ...prev,
-                      direction: e.target.value as "asc" | "desc",
-                    }))
-                  }
-                  className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg focus:outline-none focus:border-blue-500"
-                >
-                  <option value="desc">Descending</option>
-                  <option value="asc">Ascending</option>
-                </select>
-              </div>
+              <h2 className="text-2xl font-semibold mb-2">Solved Issues</h2>
+              <p className="text-white/70 text-sm mb-4">
+                Track all the bounties you&apos;ve successfully solved. View
+                your submission history and approved solutions.
+              </p>
             </div>
 
             <div className="space-y-4">
-              {bounties.map((bounty) => renderBountyCard(bounty))}
+              {solvedBountiesLoading ? (
+                <div className="text-center py-8">
+                  Loading your solved bounties...
+                </div>
+              ) : solvedBounties.length === 0 ? (
+                <div className="text-center py-8 text-white/70">
+                  {authenticated
+                    ? "You haven't solved any bounties yet."
+                    : "Please log in to view your solved bounties."}
+                </div>
+              ) : (
+                solvedBounties.map((bounty) => (
+                  <div key={bounty.id} className="glass-card rounded-xl p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-lg">{bounty.title}</h3>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-green-400">
+                          ${bounty.bountyAmount} USDC
+                        </div>
+                        <div className="text-xs text-white/60">
+                          {bounty.status}
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-white/70 text-sm mb-3 line-clamp-2">
+                      {bounty.description.substring(0, 150)}...
+                    </p>
+
+                    {bounty.prUrl && (
+                      <div className="mb-3 pb-3 border-b border-white/10">
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="text-white/60">Your solution:</span>
+                          <a
+                            href={bounty.prUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:text-blue-300 hover:underline"
+                          >
+                            PR #{bounty.prNumber}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-white/60">
+                          {bounty.githubRepoOwner}/{bounty.githubRepoName}
+                        </span>
+                      </div>
+                      <div className="flex gap-2">
+                        <a
+                          href={bounty.githubIssueUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-secondary px-3 py-1 text-sm"
+                        >
+                          View Issue
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}
@@ -1096,9 +1222,11 @@ export default function Dashboard() {
         {activeTab === "my-bounties" && (
           <div className="space-y-6">
             <div className="glass-card rounded-2xl p-6">
-              <h2 className="text-2xl font-semibold mb-4">
-                My Created Bounties
-              </h2>
+              <h2 className="text-2xl font-semibold mb-2">My Bounties</h2>
+              <p className="text-white/70 text-sm mb-4">
+                Manage all the bounties you&apos;ve created. Track submissions,
+                approve solutions, and manage rewards.
+              </p>
 
               <div className="grid grid-cols-3 gap-4">
                 <select

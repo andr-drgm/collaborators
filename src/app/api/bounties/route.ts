@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
               name: true,
               username: true,
               image: true,
+              walletAddress: true,
             },
           });
           return {
