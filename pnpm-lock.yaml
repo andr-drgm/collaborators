@@ -12,8 +12,8 @@ importers:
         specifier: ^7.0.3
         version: 7.0.3
       '@prisma/client':
-        specifier: 6.15.0
-        version: 6.15.0(prisma@6.15.0(typescript@5.8.3))(typescript@5.8.3)
+        specifier: 6.18.0
+        version: 6.18.0(prisma@6.15.0(typescript@5.8.3))(typescript@5.8.3)
       '@privy-io/react-auth':
         specifier: ^3.3.0
         version: 3.3.0(@react-native-async-storage/async-storage@1.24.0(react-native@0.79.2(@babel/core@7.28.0)(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@types/react@19.1.8)(bufferutil@4.0.9)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.8.3)(use-sync-external-store@1.6.0(react@19.1.0))(utf-8-validate@5.0.10)(zod@3.24.4)
@@ -720,8 +720,8 @@ packages:
   '@octokit/types@14.1.0':
     resolution: {integrity: sha512-1y6DgTy8Jomcpu33N+p5w58l6xyt55Ar2I91RPiIA0xCJBXyUAhXCcmZaDWSANiha7R9a6qJJ2CRomGPZ6f46g==}
 
-  '@prisma/client@6.15.0':
-    resolution: {integrity: sha512-wR2LXUbOH4cL/WToatI/Y2c7uzni76oNFND7+23ypLllBmIS8e3ZHhO+nud9iXSXKFt1SoM3fTZvHawg63emZw==}
+  '@prisma/client@6.18.0':
+    resolution: {integrity: sha512-jnL2I9gDnPnw4A+4h5SuNn8Gc+1mL1Z79U/3I9eE2gbxJG1oSA+62ByPW4xkeDgwE0fqMzzpAZ7IHxYnLZ4iQA==}
     engines: {node: '>=18.18'}
     peerDependencies:
       prisma: '*'
@@ -5192,7 +5192,7 @@ snapshots:
     dependencies:
       '@octokit/openapi-types': 25.1.0
 
-  '@prisma/client@6.15.0(prisma@6.15.0(typescript@5.8.3))(typescript@5.8.3)':
+  '@prisma/client@6.18.0(prisma@6.15.0(typescript@5.8.3))(typescript@5.8.3)':
     optionalDependencies:
       prisma: 6.15.0(typescript@5.8.3)
       typescript: 5.8.3
