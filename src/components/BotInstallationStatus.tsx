@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 
 interface BotInstallationStatusProps {
@@ -9,7 +9,7 @@ interface BotInstallationStatusProps {
   className?: string;
 }
 
-export default function BotInstallationStatus({
+const BotInstallationStatus = memo(function BotInstallationStatus({
   owner,
   repo,
   className = "",
@@ -19,14 +19,7 @@ export default function BotInstallationStatus({
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
-    if (authenticated) {
-      checkInstallationStatus();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authenticated, owner, repo]);
-
-  const checkInstallationStatus = async () => {
+  const checkInstallationStatus = useCallback(async () => {
     try {
       const token = await getAccessToken();
       if (!token) return;
@@ -49,9 +42,15 @@ export default function BotInstallationStatus({
     } finally {
       setLoading(false);
     }
-  };
+  }, [owner, repo, getAccessToken]);
 
-  const markAsInstalled = async () => {
+  useEffect(() => {
+    if (authenticated) {
+      checkInstallationStatus();
+    }
+  }, [authenticated, checkInstallationStatus]);
+
+  const markAsInstalled = useCallback(async () => {
     try {
       const token = await getAccessToken();
       if (!token) return;
@@ -72,7 +71,7 @@ export default function BotInstallationStatus({
     } catch (error) {
       console.error("Error marking bot as installed:", error);
     }
-  };
+  }, [owner, repo, getAccessToken]);
 
   if (loading) {
     return (
@@ -288,4 +287,8 @@ export default function BotInstallationStatus({
       )}
     </>
   );
-}
+});
+
+BotInstallationStatus.displayName = "BotInstallationStatus";
+
+export default BotInstallationStatus;

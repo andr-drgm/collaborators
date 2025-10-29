@@ -2,13 +2,15 @@
 
 import { shortenAddress } from "@/utils/helpers";
 import { usePrivyAuth } from "@/hooks/usePrivyAuth";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo, useCallback } from "react";
 
 interface WalletConnectProps {
   className?: string;
 }
 
-export default function WalletConnect({ className = "" }: WalletConnectProps) {
+const WalletConnect = memo(function WalletConnect({
+  className = "",
+}: WalletConnectProps) {
   const { ready, authenticated, internalWalletAddress, login } = usePrivyAuth();
 
   const [mounted, setMounted] = useState(false);
@@ -16,6 +18,14 @@ export default function WalletConnect({ className = "" }: WalletConnectProps) {
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  const handleOpenModal = useCallback(() => {
+    setShowWalletModal(true);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setShowWalletModal(false);
   }, []);
 
   if (!mounted || !ready) return null;
@@ -49,7 +59,7 @@ export default function WalletConnect({ className = "" }: WalletConnectProps) {
     <div className={`flex items-center gap-4 ${className}`}>
       {/* Wallet Display */}
       <button
-        onClick={() => setShowWalletModal(true)}
+        onClick={handleOpenModal}
         className="flex items-center gap-3 liquid-glass rounded-xl px-4 py-2 border border-white/20 hover:border-white/40 transition-all"
       >
         <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
@@ -68,7 +78,7 @@ export default function WalletConnect({ className = "" }: WalletConnectProps) {
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-bold text-white">Wallet Info</h3>
               <button
-                onClick={() => setShowWalletModal(false)}
+                onClick={handleCloseModal}
                 className="text-white/60 hover:text-white transition-colors"
               >
                 <svg
@@ -108,7 +118,7 @@ export default function WalletConnect({ className = "" }: WalletConnectProps) {
             </div>
 
             <button
-              onClick={() => setShowWalletModal(false)}
+              onClick={handleCloseModal}
               className="w-full bg-white/10 hover:bg-white/20 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-all"
             >
               Close
@@ -118,4 +128,8 @@ export default function WalletConnect({ className = "" }: WalletConnectProps) {
       )}
     </div>
   );
-}
+});
+
+WalletConnect.displayName = "WalletConnect";
+
+export default WalletConnect;

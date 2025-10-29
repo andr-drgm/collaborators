@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { memo } from "react";
 
 interface ProfileCardProps {
   imageUrl: string | undefined | null;
@@ -9,7 +10,7 @@ interface ProfileCardProps {
   githubUsername?: string | undefined | null;
 }
 
-export default function ProfileCard({
+const ProfileCard = memo(function ProfileCard({
   imageUrl,
   username,
   memberSince,
@@ -66,4 +67,8 @@ export default function ProfileCard({
       </div>
     </div>
   );
-}
+});
+
+ProfileCard.displayName = "ProfileCard";
+
+export default ProfileCard;
