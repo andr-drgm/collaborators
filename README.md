@@ -1,4 +1,4 @@
-# Collaborator
+# Collaborator - Web3 App
 
 Transform your GitHub work into on-chain rewards and reputation. Earn NFT badges and SOL tokens for your real contributions on GitHub.
 
