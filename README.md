@@ -1,180 +1,145 @@
-# Collaborator
+# Collaborators
 
-Transform your GitHub work into on-chain rewards and reputation. Earn NFT badges and SOL tokens for your real contributions on GitHub.
+<p align="center">
+  <strong>GitHub Bounty Marketplace — Earn USDC for solving open-source issues</strong>
+</p>
 
-## 🚀 What We've Built
+<p align="center">
+  <a href="https://collaborators.build"><img src="https://img.shields.io/badge/Platform-collaborators.build-blue?style=flat-square" alt="Platform" /></a>
+  <img src="https://img.shields.io/badge/Next.js-15-black?style=flat-square" alt="Next.js" />
+  <img src="https://img.shields.io/badge/Payments-USDC-2775CA?style=flat-square" alt="USDC" />
+  <img src="https://img.shields.io/badge/Chain-Solana-9945FF?style=flat-square" alt="Solana" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License" />
+</p>
 
-Collaborators is a Web3 platform that automatically converts your GitHub activity into verifiable on-chain achievements. Every meaningful contribution mints NFT badges and earns SOL tokens, helping you build your on-chain reputation while getting rewarded for open-source collaboration.
+---
 
-## ✨ Key Features
+## What Is Collaborators?
 
-- **GitHub Integration**: Seamlessly connect your GitHub account to track contributions
-- **Automatic Rewards**: Earn SOL tokens for commits, pull requests, reviews, and issue resolution
-- **NFT Badges**: Unique digital credentials minted for your achievements
-- **On-Chain Reputation**: Verifiable proof of your contributions stored on Solana blockchain
-- **Real-Time Tracking**: Monitor your contribution activity with GitHub-style heatmaps
-- **Secure Wallet Integration**: Support for Phantom, Solflare, and other Solana wallets
+**Collaborators** is a GitHub bounty marketplace that connects open-source maintainers with developers who want to get paid for their contributions.
 
-## 🎯 How It Works
+- **Maintainers** label GitHub issues with USDC bounty amounts
+- **Developers** browse open bounties, submit pull requests, and get paid automatically when their PR is merged
+- **No platform fees** — USDC goes directly to the contributor
 
-1. **Connect GitHub**: Log in with your GitHub account
-2. **Link Wallet**: Connect your Solana wallet (Phantom, Solflare, etc.)
-3. **Start Contributing**: Continue your normal GitHub workflow
-4. **Get Rewarded**: Earn tokens and NFT badges automatically
+> "Find GitHub issues with USDC bounties or create your own. Get paid automatically when your pull request is merged."
 
-## 🛠️ Technical Stack
+---
 
-- **Frontend**: Next.js 14, React, TypeScript
-- **Styling**: Tailwind CSS with custom design system
-- **Blockchain**: Solana blockchain integration
-- **Authentication**: NextAuth.js with GitHub OAuth
-- **Database**: Prisma with PostgreSQL
-- **Deployment**: Vercel-ready configuration
+## How It Works
 
-## 🚀 Getting Started
+### For Contributors
+
+1. **Browse open bounties** at [collaborators.build](https://collaborators.build)
+2. **Pick an issue** that matches your skills
+3. **Fork the repo** and submit a pull request
+4. **Get paid in USDC** automatically when your PR is merged
+
+### For Maintainers
+
+1. **Post a bounty** by adding the `bounty` and `usdc-reward` labels to any GitHub issue
+2. **Set the bounty amount** in USDC
+3. **Review pull requests** from contributors
+4. **Merge the best one** — payment is handled automatically
+
+---
+
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| **USDC Payments** | Instant stablecoin rewards on Solana — no crypto volatility |
+| **GitHub-Native** | No new workflow — work in GitHub as normal |
+| **Auto-Payment** | PR merge triggers payment automatically |
+| **Zero KYC** | Connect a Solana wallet, start earning |
+| **Transparent** | All bounties and submissions are publicly visible |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js 15, React, TypeScript |
+| Styling | Tailwind CSS |
+| Auth | NextAuth.js (GitHub OAuth) |
+| Database | Prisma + PostgreSQL |
+| Payments | USDC on Solana |
+| Deployment | Vercel |
+
+---
+
+## Development Setup
 
 ### Prerequisites
 
 - Node.js 18+ and pnpm
-- Solana wallet (Phantom, Solflare, etc.)
-- GitHub account
-- Some SOL for transaction fees
-
-### Development Setup
-
-This project uses Git hooks to ensure code quality. When you clone the repository, the following will be automatically set up:
-
-- **Pre-commit hooks**: Automatically runs `pnpm lint` before each commit
-- **Code formatting**: Ensures consistent code style across the project
-
-The hooks are managed by Husky and will be installed automatically when you run `pnpm install`.
+- PostgreSQL database
+- GitHub OAuth App credentials
+- Solana wallet
 
 ### Installation
 
-1. Clone the repository:
-
 ```bash
-git clone https://github.com/yourusername/the-collaborator.git
-cd the-collaborator
-```
+# Clone the repository
+git clone https://github.com/andr-drgm/collaborators.git
+cd collaborators
 
-2. Install dependencies:
-
-```bash
+# Install dependencies
 pnpm install
-```
 
-3. Set up environment variables:
-
-```bash
+# Configure environment
 cp .env.example .env.local
-```
+# Edit .env.local with your GitHub OAuth, database URL, and Solana config
 
-4. Configure your environment variables:
+# Set up the database
+pnpm prisma migrate dev
 
-```env
-# GitHub OAuth
-GITHUB_ID=your_github_client_id
-GITHUB_SECRET=your_github_client_secret
-
-# NextAuth
-NEXTAUTH_SECRET=your_nextauth_secret
-NEXTAUTH_URL=http://localhost:3000
-
-# Solana
-REACT_APP_MINT_AUTHORITY_SECRET_KEY=your_mint_authority_key
-```
-
-5. Run the development server:
-
-```bash
+# Start development server
 pnpm dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-## 🔧 Configuration
+### Code Quality
 
-### GitHub OAuth Setup
+This project uses pre-commit hooks (Husky) to enforce code quality:
 
-1. Go to GitHub Developer Settings
-2. Create a new OAuth App
-3. Set the callback URL to `http://localhost:3000/api/auth/callback/github`
-4. Copy the Client ID and Client Secret to your `.env.local`
-
-### Solana Configuration
-
-1. Set up a Solana wallet with some SOL
-2. Configure your mint authority for token distribution
-3. Update the mint address in the dashboard component
-
-## 📱 User Experience Improvements
-
-### For Newcomers
-
-- **Clear Value Proposition**: "Transform GitHub work into on-chain rewards and reputation"
-- **Key Terms Explained**: Hover tooltips for SOL tokens, NFT badges, and on-chain reputation
-- **Simple Steps**: 3-step onboarding process clearly explained
-- **Visual Flowchart**: Step-by-step process visualization
-
-### For Web3 Developers
-
-- **Advanced Features**: Detailed contribution tracking and analytics
-- **Technical Details**: Comprehensive dashboard with GitHub-style heatmaps
-- **Wallet Integration**: Seamless Solana wallet connection
-- **Real-Time Updates**: Live contribution tracking and reward calculation
-
-### Trust & Security
-
-- **Security Information**: Clear explanations of data privacy and wallet security
-- **FAQ Section**: Common questions about tracking, rewards, and supported wallets
-- **Help Tooltips**: Contextual assistance throughout the platform
-- **Onboarding Guidance**: Step-by-step help for wallet setup
-
-## 🎨 Design System
-
-- **Color Palette**: Cyan to teal gradients with dark theme
-- **Typography**: Geist Sans and Geist Mono fonts
-- **Components**: Consistent card designs with hover effects
-- **Responsive**: Mobile-first design with desktop optimizations
-- **Accessibility**: High contrast ratios and keyboard navigation
-
-## 🔮 Coming Soon
-
-- **Team Leaderboards**: Compete with your team and climb the ranks
-- **Exclusive NFT Tiers**: Rare collectibles for top contributors
-- **API Access**: Integrate rewards into your own applications
-- **Multi-Chain Support**: Expand beyond Solana to other blockchains
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our contributing guidelines for details on:
-
-- Code style and standards
-- Testing requirements
-- Pull request process
-- Community guidelines
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-- **Documentation**: Check this README and inline help tooltips
-- **Issues**: Report bugs or feature requests via GitHub Issues
-- **Discussions**: Join community discussions for help and ideas
-- **Email**: Contact the team directly for urgent matters
-
-## 🌟 Acknowledgments
-
-- Solana Foundation for blockchain infrastructure
-- GitHub for developer platform integration
-- Next.js team for the amazing framework
-- Our community of contributors and testers
+- `pnpm lint` runs before every commit
+- `pnpm build` validates the production build
 
 ---
 
-**Collaborators** - Building the future of developer collaboration and rewards.
+## Environment Variables
 
-_Transform your contributions. Build your reputation. Get rewarded._
+| Variable | Description |
+|----------|-------------|
+| `NEXTAUTH_SECRET` | Secret for NextAuth session signing |
+| `GITHUB_ID` | GitHub OAuth App client ID |
+| `GITHUB_SECRET` | GitHub OAuth App client secret |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `SOLANA_RPC_URL` | Solana RPC endpoint |
+
+---
+
+## Contributing
+
+Contributions are welcome! Check the [open bounties](https://collaborators.build) for paid issues, or open a regular PR for bug fixes and improvements.
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m 'feat: add your feature'`
+4. Push and open a pull request
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE) for details.
+
+---
+
+<p align="center">
+  Built with ❤️ for the open-source community &nbsp;|&nbsp;
+  <a href="https://collaborators.build">collaborators.build</a>
+</p>
