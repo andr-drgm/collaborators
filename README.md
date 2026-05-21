@@ -1,180 +1,160 @@
-# Collaborator
+# Collaborators
 
-Transform your GitHub work into on-chain rewards and reputation. Earn NFT badges and SOL tokens for your real contributions on GitHub.
+Collaborators is a GitHub-first bounty marketplace for open-source work. Maintainers publish USDC-denominated rewards on GitHub issues, contributors submit pull requests, and the app tracks bounty status, submissions, verification, and solver history.
 
-## 🚀 What We've Built
+The application is built as a Next.js dashboard with Privy authentication, Prisma/PostgreSQL persistence, GitHub issue and webhook integrations, and Solana wallet support for the reward flow.
 
-Collaborators is a Web3 platform that automatically converts your GitHub activity into verifiable on-chain achievements. Every meaningful contribution mints NFT badges and earns SOL tokens, helping you build your on-chain reputation while getting rewarded for open-source collaboration.
+## What The App Does
 
-## ✨ Key Features
+- Turns GitHub issues into bounty listings with repository, issue, label, amount, poster, and status metadata.
+- Lets contributors discover active bounties, open the source issue, and submit a PR URL for review.
+- Tracks each bounty submission as `PENDING`, `APPROVED`, or `REJECTED`.
+- Marks bounties as solved when a maintainer closes the tracked issue or a webhook records the accepted solver.
+- Stores user profile, GitHub identity, Privy wallet identity, bot installation, and legacy project-assignment data.
+- Provides a dashboard for posted bounties, submitted solutions, issue search, profile state, and wallet connection.
 
-- **GitHub Integration**: Seamlessly connect your GitHub account to track contributions
-- **Automatic Rewards**: Earn SOL tokens for commits, pull requests, reviews, and issue resolution
-- **NFT Badges**: Unique digital credentials minted for your achievements
-- **On-Chain Reputation**: Verifiable proof of your contributions stored on Solana blockchain
-- **Real-Time Tracking**: Monitor your contribution activity with GitHub-style heatmaps
-- **Secure Wallet Integration**: Support for Phantom, Solflare, and other Solana wallets
+## Tech Stack
 
-## 🎯 How It Works
+- Next.js 15 and React 19
+- TypeScript
+- Tailwind CSS 4
+- Prisma 6 with PostgreSQL
+- Privy for embedded authentication and wallet identity
+- Octokit for GitHub API access
+- Solana Web3.js and SPL Token helpers
+- Vercel-oriented deployment config
 
-1. **Connect GitHub**: Log in with your GitHub account
-2. **Link Wallet**: Connect your Solana wallet (Phantom, Solflare, etc.)
-3. **Start Contributing**: Continue your normal GitHub workflow
-4. **Get Rewarded**: Earn tokens and NFT badges automatically
+## Repository Map
 
-## 🛠️ Technical Stack
+```text
+src/app/                         Next.js app routes and API handlers
+src/app/api/bounties/            Bounty listing, detail, and submission APIs
+src/app/api/github/              GitHub issue search, labels, webhook, and bot installation APIs
+src/components/dashboard/        Dashboard cards and bounty UI
+src/hooks/usePrivyAuth.ts        Privy session helper
+src/lib/privy.ts                 Server-side Privy client
+src/prisma.ts                    Prisma client export
+prisma/schema.prisma             Database schema
+PRIVY_SETUP.md                   Privy setup notes
+MIGRATION_SUMMARY.md             Migration context from legacy project flows
+```
 
-- **Frontend**: Next.js 14, React, TypeScript
-- **Styling**: Tailwind CSS with custom design system
-- **Blockchain**: Solana blockchain integration
-- **Authentication**: NextAuth.js with GitHub OAuth
-- **Database**: Prisma with PostgreSQL
-- **Deployment**: Vercel-ready configuration
+## Data Model
 
-## 🚀 Getting Started
+The current Prisma schema centers on these records:
+
+- `User`: profile, GitHub login, Privy id, wallet address, unclaimed token count, and relationships.
+- `Bounty`: one reward listing per GitHub issue and repository, with USDC amount, labels, poster, status, solved fields, and submissions.
+- `BountySubmission`: a contributor PR URL, PR number, status, verification fields, and the submitting user.
+- `BotInstallation`: installed GitHub bot state for a repository.
+- `Project` and `ProjectAssignment`: legacy project-tracking models kept for migration compatibility.
+
+## Local Setup
 
 ### Prerequisites
 
-- Node.js 18+ and pnpm
-- Solana wallet (Phantom, Solflare, etc.)
-- GitHub account
-- Some SOL for transaction fees
+- Node.js 20 or newer
+- pnpm
+- PostgreSQL
+- A Privy app
+- GitHub OAuth or GitHub app credentials, depending on the flow you are testing
 
-### Development Setup
-
-This project uses Git hooks to ensure code quality. When you clone the repository, the following will be automatically set up:
-
-- **Pre-commit hooks**: Automatically runs `pnpm lint` before each commit
-- **Code formatting**: Ensures consistent code style across the project
-
-The hooks are managed by Husky and will be installed automatically when you run `pnpm install`.
-
-### Installation
-
-1. Clone the repository:
+### Install
 
 ```bash
-git clone https://github.com/yourusername/the-collaborator.git
-cd the-collaborator
-```
-
-2. Install dependencies:
-
-```bash
+git clone https://github.com/andr-drgm/collaborators.git
+cd collaborators
 pnpm install
 ```
 
-3. Set up environment variables:
+### Environment
 
-```bash
-cp .env.example .env.local
-```
-
-4. Configure your environment variables:
+Create `.env.local` and configure the values used by the app:
 
 ```env
-# GitHub OAuth
-GITHUB_ID=your_github_client_id
-GITHUB_SECRET=your_github_client_secret
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
 
-# NextAuth
-NEXTAUTH_SECRET=your_nextauth_secret
-NEXTAUTH_URL=http://localhost:3000
+NEXT_PUBLIC_PRIVY_APP_ID=your_privy_app_id
+PRIVY_APP_SECRET=your_privy_app_secret
 
-# Solana
-REACT_APP_MINT_AUTHORITY_SECRET_KEY=your_mint_authority_key
+GITHUB_WEBHOOK_SECRET=your_webhook_secret
+
+NEXT_PUBLIC_X_URL=https://x.com/collaborat0rs
+NEXT_PUBLIC_PRIVACY_URL=https://example.com/privacy
+NEXT_PUBLIC_TERMS_URL=https://example.com/terms
 ```
 
-5. Run the development server:
+Use local-only test credentials for development. Do not commit real secrets.
+
+### Database
+
+Generate the Prisma client after dependency installation:
+
+```bash
+pnpm prisma generate
+```
+
+Apply migrations or sync the schema with the workflow used by your deployment:
+
+```bash
+pnpm prisma migrate dev
+```
+
+### Run
 
 ```bash
 pnpm dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser
+Open `http://localhost:3000`.
 
-## 🔧 Configuration
+## Common Workflows
 
-### GitHub OAuth Setup
+### Post Or Track A Bounty
 
-1. Go to GitHub Developer Settings
-2. Create a new OAuth App
-3. Set the callback URL to `http://localhost:3000/api/auth/callback/github`
-4. Copy the Client ID and Client Secret to your `.env.local`
+1. Create a GitHub issue for the work.
+2. Add bounty metadata in the Collaborators dashboard.
+3. The app stores the issue id, repository owner/name, title, description, labels, poster, and USDC amount.
+4. Contributors use the linked issue and repository to prepare their PR.
 
-### Solana Configuration
+### Submit A Solution
 
-1. Set up a Solana wallet with some SOL
-2. Configure your mint authority for token distribution
-3. Update the mint address in the dashboard component
+1. Open an active bounty.
+2. Create a PR in the target repository.
+3. Submit the PR URL through the bounty submission flow.
+4. The app records the PR number and keeps the submission pending until verification.
 
-## 📱 User Experience Improvements
+### Webhook Verification
 
-### For Newcomers
+The GitHub webhook route listens for issue and PR events. When a tracked issue is closed or a completion signal is detected, the app can update the matching bounty as solved and record solver metadata.
 
-- **Clear Value Proposition**: "Transform GitHub work into on-chain rewards and reputation"
-- **Key Terms Explained**: Hover tooltips for SOL tokens, NFT badges, and on-chain reputation
-- **Simple Steps**: 3-step onboarding process clearly explained
-- **Visual Flowchart**: Step-by-step process visualization
+Configure the webhook secret with `GITHUB_WEBHOOK_SECRET` and point GitHub to the deployed webhook route.
 
-### For Web3 Developers
+## Scripts
 
-- **Advanced Features**: Detailed contribution tracking and analytics
-- **Technical Details**: Comprehensive dashboard with GitHub-style heatmaps
-- **Wallet Integration**: Seamless Solana wallet connection
-- **Real-Time Updates**: Live contribution tracking and reward calculation
+```bash
+pnpm dev       # Start local development server
+pnpm build     # Generate Prisma client and build Next.js
+pnpm start     # Start production build
+pnpm lint      # Run lint command configured by the project
+```
 
-### Trust & Security
+`postinstall` runs `prisma generate`, and Husky is prepared through the `prepare` script.
 
-- **Security Information**: Clear explanations of data privacy and wallet security
-- **FAQ Section**: Common questions about tracking, rewards, and supported wallets
-- **Help Tooltips**: Contextual assistance throughout the platform
-- **Onboarding Guidance**: Step-by-step help for wallet setup
+## Deployment Notes
 
-## 🎨 Design System
+- Set the same environment variables in Vercel or your hosting provider.
+- Ensure the production database is reachable by Prisma.
+- Keep webhook secrets and Privy secrets server-side only.
+- Run the production build before release to catch Prisma and Next.js integration issues.
 
-- **Color Palette**: Cyan to teal gradients with dark theme
-- **Typography**: Geist Sans and Geist Mono fonts
-- **Components**: Consistent card designs with hover effects
-- **Responsive**: Mobile-first design with desktop optimizations
-- **Accessibility**: High contrast ratios and keyboard navigation
+## Security Notes
 
-## 🔮 Coming Soon
+- Never expose `PRIVY_APP_SECRET`, `DATABASE_URL`, private wallet keys, or webhook secrets in client-side code.
+- Validate PR URLs before accepting bounty submissions.
+- Treat webhook events as untrusted until signature verification succeeds.
+- Keep payout state separate from display state so pending submissions cannot be mistaken for approved rewards.
 
-- **Team Leaderboards**: Compete with your team and climb the ranks
-- **Exclusive NFT Tiers**: Rare collectibles for top contributors
-- **API Access**: Integrate rewards into your own applications
-- **Multi-Chain Support**: Expand beyond Solana to other blockchains
+## Contributing
 
-## 🤝 Contributing
-
-We welcome contributions! Please see our contributing guidelines for details on:
-
-- Code style and standards
-- Testing requirements
-- Pull request process
-- Community guidelines
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-- **Documentation**: Check this README and inline help tooltips
-- **Issues**: Report bugs or feature requests via GitHub Issues
-- **Discussions**: Join community discussions for help and ideas
-- **Email**: Contact the team directly for urgent matters
-
-## 🌟 Acknowledgments
-
-- Solana Foundation for blockchain infrastructure
-- GitHub for developer platform integration
-- Next.js team for the amazing framework
-- Our community of contributors and testers
-
----
-
-**Collaborators** - Building the future of developer collaboration and rewards.
-
-_Transform your contributions. Build your reputation. Get rewarded._
+Contributions are welcome. For bounty work, link your PR to the relevant GitHub issue and keep changes scoped to the requested behavior. For documentation changes, prefer repository-accurate setup steps over broad marketing copy.
