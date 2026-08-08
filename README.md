@@ -1,8 +1,13 @@
 # Collaborators
 
-Collaborators is a GitHub bounty marketplace for funding open-source work and rewarding accepted pull requests in USDC. Maintainers attach bounties to GitHub issues, contributors submit a pull request as their solution, and repository webhooks keep the bounty status in sync when the work is merged.
+Collaborators is a GitHub bounty marketplace for funding open-source work and
+rewarding accepted pull requests in USDC. Maintainers attach bounties to GitHub
+issues, contributors submit a pull request as their solution, and repository
+webhooks keep the bounty status in sync when the work is merged.
 
-> **Project status:** this repository contains the bounty-focused MVP. Parts of the original contribution-tracking product remain under `archive/` directories, but they are not part of the active dashboard.
+> **Project status:** this repository contains the bounty-focused MVP. Parts of
+> the original contribution-tracking product remain under `archive/`
+> directories, but they are not part of the active dashboard.
 
 ## How it works
 
@@ -15,11 +20,15 @@ flowchart LR
     E --> F["Submission is approved and bounty is solved"]
 ```
 
-1. Sign in with GitHub. Privy handles authentication and creates an embedded Solana wallet for users who do not already have one.
+1. Sign in with GitHub. Privy handles authentication and creates an embedded
+   Solana wallet for users who do not already have one.
 2. Search public GitHub issues or browse the issues you created.
-3. Add a USDC-denominated bounty to an issue and configure the repository webhook.
-4. A contributor solves the issue and submits the pull request URL from the bounty card.
-5. When GitHub reports that the pull request was merged, Collaborators approves the matching submission and marks the bounty as solved.
+3. Add a USDC-denominated bounty to an issue and configure the repository
+   webhook.
+4. A contributor solves the issue and submits the pull request URL from the
+   bounty card.
+5. When GitHub reports that the pull request was merged, Collaborators approves
+   the matching submission and marks the bounty as solved.
 
 ## Features
 
@@ -30,7 +39,8 @@ flowchart LR
 - Pull request solution submissions
 - GitHub webhook tracking for issues and pull requests
 - Automatic submission verification after a matching pull request is merged
-- Separate views for active bounties, solved bounties, personal issues, and bounties you posted
+- Separate views for active bounties, solved bounties, personal issues, and
+  bounties you posted
 - Responsive dark interface built with Tailwind CSS
 
 ## Technology
@@ -68,7 +78,8 @@ pnpm install
 In the [Privy dashboard](https://dashboard.privy.io/):
 
 1. Enable GitHub as a login method.
-2. Enable **Return OAuth tokens** for GitHub. The personal-issues view needs the returned token to call the GitHub API for the signed-in user.
+2. Enable **Return OAuth tokens** for GitHub. The personal-issues view needs the
+   returned token to call the GitHub API for the signed-in user.
 3. Enable Solana embedded wallets and create them for users without wallets.
 4. Add `http://localhost:3000` to the allowed application domains.
 
@@ -109,7 +120,8 @@ NEXT_PUBLIC_PRIVACY_URL="https://example.com/privacy"
 NEXT_PUBLIC_TERMS_URL="https://example.com/terms"
 ```
 
-Keep server secrets out of variables prefixed with `NEXT_PUBLIC_`, and never commit `.env.local`.
+Keep server secrets out of variables prefixed with `NEXT_PUBLIC_`, and never
+commit `.env.local`.
 
 ### 4. Prepare the database
 
@@ -141,11 +153,12 @@ The endpoint handles these events:
 
 | Event | Result |
 | --- | --- |
-| `ping` | Registers the repository installation for the GitHub user who added the webhook |
+| `ping` | Registers the repository for the GitHub user |
 | `issues` | Updates a matching bounty when its issue changes state |
-| `pull_request` | Approves a pending submission and solves its bounty when the submitted PR is merged |
+| `pull_request` | Solves a bounty when its submitted PR is merged |
 
-For local webhook testing, expose port `3000` through an HTTPS tunnel and use the tunnel URL as the payload URL.
+For local webhook testing, expose port `3000` through an HTTPS tunnel and use
+the tunnel URL as the payload URL.
 
 ## Project structure
 
@@ -175,9 +188,9 @@ src/
 | `POST /api/bounties` | Create a bounty for a GitHub issue |
 | `PATCH /api/bounties/:id` | Update a bounty you posted |
 | `DELETE /api/bounties/:id` | Delete a bounty you posted |
-| `POST /api/bounties/submissions` | Submit a pull request for an active bounty |
+| `POST /api/bounties/submissions` | Submit a PR for an active bounty |
 | `GET /api/github/search/issues` | Search public GitHub issues |
-| `GET /api/github/user/issues` | List issues created by the signed-in GitHub user |
+| `GET /api/github/user/issues` | List the signed-in user's issues |
 | `POST /api/github/webhook` | Process repository webhook events |
 | `GET /api/user/me` | Verify the Privy token and sync the local user record |
 
@@ -196,7 +209,8 @@ pnpm exec tsc --noEmit
 pnpm exec eslint .
 ```
 
-To verify a production build, provide the required environment variables and a reachable PostgreSQL database, then run:
+To verify a production build, provide the required environment variables and a
+reachable PostgreSQL database, then run:
 
 ```bash
 pnpm build
@@ -204,26 +218,36 @@ pnpm build
 
 ## Security notes
 
-- Give GitHub tokens only the permissions required by the repositories and operations you use.
-- Store `PRIVY_APP_SECRET`, GitHub tokens, database credentials, and the webhook secret only in server-side secret storage.
+- Give GitHub tokens only the permissions required by the repositories and
+  operations you use.
+- Store `PRIVY_APP_SECRET`, GitHub tokens, database credentials, and the webhook
+  secret only in server-side secret storage.
 - Always configure a unique webhook secret for production deployments.
-- Review OAuth permissions before authorizing the application, especially when private repositories are accessible to the selected GitHub account.
-- Do not put wallet private keys or mint authority secrets in client-exposed environment variables.
+- Review OAuth permissions before authorizing the application, especially when
+  private repositories are accessible to the selected GitHub account.
+- Do not put wallet private keys or mint authority secrets in client-exposed
+  environment variables.
 
 ## Contributing
 
 1. Fork the repository and create a focused branch.
 2. Keep changes scoped and document any new environment variables or migrations.
 3. Run the development checks above.
-4. Open a pull request that explains the behavior change and how it was verified.
+4. Open a pull request that explains the behavior change and how it was
+   verified.
 
-Bug reports and feature proposals are welcome in [GitHub Issues](https://github.com/andr-drgm/collaborators/issues).
+Bug reports and feature proposals are welcome in [GitHub Issues].
+
+[GitHub Issues]: https://github.com/andr-drgm/collaborators/issues
 
 ## Additional documentation
 
-- [`PRIVY_SETUP.md`](PRIVY_SETUP.md) explains the authentication and embedded-wallet configuration in more detail.
-- [`MIGRATION_SUMMARY.md`](MIGRATION_SUMMARY.md) describes the shift from contribution tracking to the current bounty marketplace MVP.
+- [`PRIVY_SETUP.md`](PRIVY_SETUP.md) explains the authentication and
+  embedded-wallet configuration in more detail.
+- [`MIGRATION_SUMMARY.md`](MIGRATION_SUMMARY.md) describes the shift from
+  contribution tracking to the current bounty marketplace MVP.
 
 ## License
 
-No license file is currently included in this repository. Until the maintainers add one, normal copyright rules apply.
+No license file is currently included in this repository. Until the maintainers
+add one, normal copyright rules apply.
