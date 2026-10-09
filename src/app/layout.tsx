@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import PrivyProviders from "./PrivyProviders";
@@ -64,6 +64,10 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: "#05070b",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -72,7 +76,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased animated-background bg-gradient-to-b from-black via-blue-950/20 to-red-950/20`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-bg font-sans text-fg antialiased`}
       >
         <PrivyProviders>{children}</PrivyProviders>
       </body>

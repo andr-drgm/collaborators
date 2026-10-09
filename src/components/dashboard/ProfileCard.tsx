@@ -17,55 +17,54 @@ const ProfileCard = memo(function ProfileCard({
   className = "",
   githubUsername,
 }: ProfileCardProps) {
+  const displayName = githubUsername ? `@${githubUsername}` : username;
+
   return (
-    <div className={`flex flex-col items-center ${className}`}>
-      {/* Profile Image with enhanced styling */}
+    <section
+      aria-label="Profile"
+      className={`flex flex-col items-center ${className}`}
+    >
       <div className="relative mb-6">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 scale-110 rounded-full bg-gradient-to-br from-brand-teal/25 to-brand-blue/25 blur-2xl"
+        ></div>
         {imageUrl ? (
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-2xl scale-110"></div>
-            <Image
-              src={imageUrl}
-              alt="Profile"
-              className="relative w-32 h-32 rounded-full border-4 border-white/20 shadow-2xl"
-              width={128}
-              height={128}
-            />
-          </div>
+          <Image
+            src={imageUrl}
+            alt={displayName ? `${displayName} avatar` : "Profile avatar"}
+            className="relative h-24 w-24 rounded-full border-4 border-line-strong shadow-2xl sm:h-32 sm:w-32"
+            width={128}
+            height={128}
+          />
         ) : (
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-2xl scale-110"></div>
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 animate-pulse border-4 border-white/20 shadow-2xl"></div>
-          </div>
+          <div className="skeleton relative h-24 w-24 rounded-full sm:h-32 sm:w-32"></div>
         )}
       </div>
 
-      {/* Profile Info with liquid glass card */}
-      <div className="liquid-glass rounded-2xl p-6 w-full max-w-sm text-center transition-all duration-500 hover:liquid-glass-hover">
+      <div className="card w-full max-w-sm p-6 text-center">
         {githubUsername ? (
           <a
             href={`https://github.com/${githubUsername}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-2xl font-bold text-white mb-2 hover:text-blue-400 transition-colors block"
+            className="mb-1 block break-all rounded text-2xl font-bold text-fg transition-colors hover:text-brand-teal"
           >
             @{githubUsername}
           </a>
         ) : username ? (
-          <div className="text-2xl font-bold text-white mb-2">{username}</div>
+          <p className="mb-1 break-all text-2xl font-bold text-fg">{username}</p>
         ) : (
-          <div className="h-8 w-48 bg-white/10 rounded-lg animate-pulse mb-2"></div>
+          <div className="skeleton mx-auto mb-2 h-8 w-48"></div>
         )}
 
         {memberSince ? (
-          <div className="text-sm text-white/60">
-            Member since: {memberSince}
-          </div>
+          <p className="text-sm text-subtle">Member since {memberSince}</p>
         ) : (
-          <div className="h-5 w-40 bg-white/10 rounded-lg animate-pulse"></div>
+          <div className="skeleton mx-auto h-5 w-40"></div>
         )}
       </div>
-    </div>
+    </section>
   );
 });
 

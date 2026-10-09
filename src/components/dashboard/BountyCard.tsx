@@ -78,71 +78,77 @@ const BountyCard = memo(function BountyCard({
   }, []);
 
   return (
-    <div className="glass-card rounded-xl p-4">
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="font-semibold text-lg">{bounty.title}</h3>
+    <article className="card p-4 sm:p-5">
+      <div className="mb-2 flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
+        <h3 className="min-w-0 flex-1 break-words text-lg font-semibold">
+          {bounty.title}
+        </h3>
         <div className="text-right">
-          <div className="text-lg font-bold text-green-400">
+          <div className="text-lg font-bold text-success">
             ${bounty.bountyAmount} USDC
           </div>
-          <div className="text-xs text-white/60">{bounty.status}</div>
+          <div className="text-xs font-medium uppercase tracking-wide text-subtle">
+            {bounty.status}
+          </div>
         </div>
       </div>
-      <p className="text-white/70 text-sm mb-3 line-clamp-2">
-        {bounty.description.substring(0, 150)}...
-      </p>
+      {bounty.description && (
+        <p className="mb-3 line-clamp-2 break-words text-sm text-muted">
+          {bounty.description}
+        </p>
+      )}
 
       {bounty.status === "SOLVED" && bounty.solver && (
-        <div className="mb-3 pb-3 border-b border-white/10">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-white/60">Solved by:</span>
-              {bounty.solver.image && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={bounty.solver.image}
-                  alt={bounty.solver.name || "Solver"}
-                  className="w-5 h-5 rounded-full"
-                />
-              )}
-              <span className="text-blue-400 font-medium">
-                {bounty.solver.name || bounty.solver.username || "Anonymous"}
-              </span>
-            </div>
-            {bounty.solver.username && (
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-white/60">GitHub:</span>
-                <a
-                  href={`https://github.com/${bounty.solver.username}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 hover:underline"
-                >
-                  @{bounty.solver.username}
-                </a>
-              </div>
+        <div className="mb-3 space-y-2 border-b border-line pb-3">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-subtle">Solved by:</span>
+            {bounty.solver.image && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={bounty.solver.image}
+                alt=""
+                className="h-5 w-5 rounded-full"
+              />
             )}
-            {bounty.solver.walletAddress && (
-              <div className="flex items-center gap-2 text-xs">
-                <span className="text-white/60">Wallet:</span>
-                <button
-                  onClick={() =>
-                    handleCopyWallet(bounty.solver!.walletAddress!)
-                  }
-                  className="text-green-400 font-mono hover:text-green-300 hover:underline cursor-pointer"
-                  title="Click to copy full address"
-                >
-                  {bounty.solver.walletAddress.slice(0, 6)}...
-                  {bounty.solver.walletAddress.slice(-4)}
-                </button>
-              </div>
-            )}
+            <span className="font-medium text-brand-link">
+              {bounty.solver.name || bounty.solver.username || "Anonymous"}
+            </span>
           </div>
+          {bounty.solver.username && (
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-subtle">GitHub:</span>
+              <a
+                href={`https://github.com/${bounty.solver.username}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link"
+              >
+                @{bounty.solver.username}
+              </a>
+            </div>
+          )}
+          {bounty.solver.walletAddress && (
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-subtle">Wallet:</span>
+              <button
+                type="button"
+                onClick={() =>
+                  handleCopyWallet(bounty.solver!.walletAddress!)
+                }
+                className="rounded font-mono text-success hover:underline"
+                title="Click to copy full address"
+                aria-label={`Copy wallet address ${bounty.solver.walletAddress}`}
+              >
+                {bounty.solver.walletAddress.slice(0, 6)}...
+                {bounty.solver.walletAddress.slice(-4)}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
       {authenticated && (
-        <div className="mb-3 pb-3 border-b border-white/10">
+        <div className="mb-3 border-b border-line pb-3">
           <BotInstallationStatus
             owner={bounty.githubRepoOwner}
             repo={bounty.githubRepoName}
@@ -150,18 +156,16 @@ const BountyCard = memo(function BountyCard({
         </div>
       )}
 
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-white/60">
-            {bounty.githubRepoOwner}/{bounty.githubRepoName}
-          </span>
-        </div>
-        <div className="flex gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <span className="min-w-0 break-all text-sm text-subtle">
+          {bounty.githubRepoOwner}/{bounty.githubRepoName}
+        </span>
+        <div className="flex flex-wrap gap-2">
           <a
             href={bounty.githubIssueUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-secondary px-3 py-1 text-sm"
+            className="btn btn-secondary btn-sm"
           >
             View Issue
           </a>
@@ -169,16 +173,18 @@ const BountyCard = memo(function BountyCard({
             <>
               {onEdit && (
                 <button
+                  type="button"
                   onClick={() => onEdit(bounty)}
-                  className="btn-primary px-3 py-1 text-sm"
+                  className="btn btn-secondary btn-sm"
                 >
                   Edit
                 </button>
               )}
               {onDelete && (
                 <button
+                  type="button"
                   onClick={() => onDelete(bounty.id, bounty.title)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-sm rounded-lg transition-colors"
+                  className="btn btn-danger btn-sm"
                 >
                   Delete
                 </button>
@@ -186,15 +192,16 @@ const BountyCard = memo(function BountyCard({
             </>
           ) : (
             <button
+              type="button"
               onClick={handleSubmitSolution}
-              className="btn-primary px-3 py-1 text-sm"
+              className="btn btn-primary btn-sm"
             >
               Submit Solution
             </button>
           )}
         </div>
       </div>
-    </div>
+    </article>
   );
 });
 
