@@ -23,10 +23,10 @@ export async function POST(request: NextRequest) {
     const dbUser = await syncPrivyUserToDb(privyUser, prisma);
 
     const body = await request.json();
-    const { bountyId, prUrl, prNumber } = body;
+    const { bountyId, prUrl } = body;
 
     // Validate required fields
-    if (!bountyId || !prUrl || !prNumber) {
+    if (!bountyId || typeof prUrl !== "string") {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -48,6 +48,39 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    if (bounty.bountyPosterId === dbUser.id) {
+      return NextResponse.json(
+        { error: "You cannot submit to your own bounty" },
+        { status: 403 }
+      );
+    }
+
+    // The webhook matches the merged PR's author against this username
+    if (!dbUser.username) {
+      return NextResponse.json(
+        { error: "Link your GitHub account before submitting" },
+        { status: 400 }
+      );
+    }
+
+    // Derive the PR number server-side and require the PR to be in the bounty's repo
+    const match = prUrl.match(
+      /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/i
+    );
+    if (
+      !match ||
+      match[1].toLowerCase() !== bounty.githubRepoOwner.toLowerCase() ||
+      match[2].toLowerCase() !== bounty.githubRepoName.toLowerCase()
+    ) {
+      return NextResponse.json(
+        {
+          error: `PR URL must be a pull request in ${bounty.githubRepoOwner}/${bounty.githubRepoName}`,
+        },
+        { status: 400 }
+      );
+    }
+    const prNumber = parseInt(match[3]);
 
     // Check if user already submitted for this bounty
     const existingSubmission = await prisma.bountySubmission.findUnique({
@@ -72,7 +105,7 @@ export async function POST(request: NextRequest) {
         bountyId,
         userId: dbUser.id,
         prUrl,
-        prNumber: parseInt(prNumber),
+        prNumber,
         status: "PENDING",
       },
       include: {
