@@ -112,7 +112,7 @@ const BotInstallationStatus = memo(function BotInstallationStatus({
       <span className="chip">Pull requests</span>
     </>,
     <>
-      Add a webhook secret (optional but recommended) and click{" "}
+      Paste the Collaborators webhook secret (required) and click{" "}
       <span className="chip">Add webhook</span>
     </>,
   ];

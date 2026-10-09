@@ -814,7 +814,7 @@ export default function Dashboard() {
                       6
                     </span>
                     <div className="min-w-0 pt-0.5">
-                      Add a webhook secret (optional but recommended) and
+                      Paste the Collaborators webhook secret (required) and
                       click <span className="chip">Add webhook</span>
                     </div>
                   </li>
