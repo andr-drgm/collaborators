@@ -53,71 +53,76 @@ const IssueCard = memo(function IssueCard({
       : null);
 
   return (
-    <div className="glass-card rounded-xl p-4">
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="font-semibold text-lg">{issue.title}</h3>
-        <span className="text-sm text-white/60">#{issue.number}</span>
+    <article className="card p-4 sm:p-5">
+      <div className="mb-2 flex items-start justify-between gap-4">
+        <h3 className="min-w-0 flex-1 break-words text-lg font-semibold">
+          {issue.title}
+        </h3>
+        <span className="shrink-0 text-sm text-subtle">#{issue.number}</span>
       </div>
-      <p className="text-white/70 text-sm mb-3 line-clamp-2">
-        {issue.body?.substring(0, 150)}...
-      </p>
+      {issue.body && (
+        <p className="mb-3 line-clamp-2 break-words text-sm text-muted">
+          {issue.body}
+        </p>
+      )}
 
       {issue.labels.length > 0 && (
-        <div className="flex flex-wrap gap-1 mb-3">
+        <ul className="mb-3 flex flex-wrap gap-1" aria-label="Labels">
           {issue.labels.map((label) => (
-            <span
+            <li
               key={label.name}
-              className="text-xs px-2 py-1 rounded"
+              className="rounded-md px-2 py-0.5 text-xs font-medium"
               style={{
-                backgroundColor: `#${label.color}20`,
+                backgroundColor: `#${label.color}26`,
                 color: `#${label.color}`,
-                border: `1px solid #${label.color}40`,
+                border: `1px solid #${label.color}66`,
               }}
             >
               {label.name}
-            </span>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
 
       {authenticated && repoOwner && repoName && (
-        <div className="mb-3 pb-3 border-b border-white/10">
+        <div className="mb-3 border-b border-line pb-3">
           <BotInstallationStatus owner={repoOwner} repo={repoName} />
         </div>
       )}
 
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-white/60">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="min-w-0 break-all text-sm text-subtle">
             {issue.repository?.full_name ||
               (issue.repository_url
                 ? issue.repository_url.split("/").slice(-2).join("/")
                 : "Unknown Repository")}
           </span>
-          <span className="text-xs px-2 py-1 bg-white/10 rounded">
+          <span className="rounded-md bg-surface-strong px-2 py-0.5 text-xs capitalize text-muted">
             {issue.state}
           </span>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <a
             href={issue.html_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-secondary px-3 py-1 text-sm"
+            className="btn btn-secondary btn-sm"
           >
             View Issue
           </a>
           {onAddBounty && (
             <button
+              type="button"
               onClick={() => onAddBounty(issue)}
-              className="btn-primary px-3 py-1 text-sm"
+              className="btn btn-primary btn-sm"
             >
               Add Bounty
             </button>
           )}
         </div>
       </div>
-    </div>
+    </article>
   );
 });
 

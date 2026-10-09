@@ -44,8 +44,8 @@ export async function PUT(
       );
     }
 
-    // Validate bounty amount
-    if (bountyAmount <= 0) {
+    // Validate bounty amount (also rejects strings/NaN)
+    if (!Number.isFinite(bountyAmount) || bountyAmount <= 0) {
       return NextResponse.json(
         { error: "Bounty amount must be greater than 0" },
         { status: 400 }

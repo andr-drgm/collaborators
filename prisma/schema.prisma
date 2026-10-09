@@ -26,7 +26,7 @@ model User {
   username String? @unique
 
   // Token tracking
-  unclaimedTokens Int @default(0)
+  unclaimedTokens Decimal @default(0)
 
   // Internal wallet fields (legacy - can be deprecated once Privy is fully adopted)
   walletBalance             Int?

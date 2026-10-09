@@ -17,8 +17,8 @@ export function verifyGitHubWebhook(
   const expectedSignature =
     "sha256=" + crypto.createHmac("sha256", secret).update(body).digest("hex");
 
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature)
-  );
+  // timingSafeEqual throws on length mismatch, so check length first
+  const a = Buffer.from(signature);
+  const b = Buffer.from(expectedSignature);
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
 }

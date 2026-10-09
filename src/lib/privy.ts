@@ -50,7 +50,6 @@ export async function getPrivyUser(accessToken: string) {
     // Fetch the full user profile from Privy
     try {
       const userProfile = await privyServer.getUser(verifiedClaims.userId);
-      console.log("Full user profile:", JSON.stringify(userProfile, null, 2));
       return userProfile;
     } catch (profileError) {
       console.error("Error fetching user profile:", profileError);
@@ -111,9 +110,6 @@ export async function syncPrivyUserToDb(
     const wallet = privyUser.linkedAccounts?.find(
       (account) => account.type === "wallet" || account.type === "smart_wallet"
     );
-
-    // Debug: Log GitHub account data
-    console.log("GitHub account data:", JSON.stringify(githubAccount, null, 2));
 
     // Extract GitHub profile image
     // Privy doesn't provide the avatar URL directly, so construct it from GitHub user ID
