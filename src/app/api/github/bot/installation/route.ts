@@ -99,9 +99,9 @@ export async function POST(request: NextRequest) {
         installed: true,
         installedBy: user.id,
       },
+      // Don't let another user take over an existing installation record
       update: {
         installed: true,
-        installedBy: user.id,
       },
     });
 
@@ -146,18 +146,17 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Mark as uninstalled
-    await prisma.botInstallation.update({
-      where: {
-        owner_repo: {
-          owner,
-          repo,
-        },
-      },
-      data: {
-        installed: false,
-      },
+    // Mark as uninstalled (only the user who installed it)
+    const { count } = await prisma.botInstallation.updateMany({
+      where: { owner, repo, installedBy: user.id },
+      data: { installed: false },
     });
+    if (count === 0) {
+      return NextResponse.json(
+        { error: "Installation not found" },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
