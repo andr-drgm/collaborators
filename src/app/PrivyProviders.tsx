@@ -12,7 +12,7 @@ export default function PrivyProviders({ children }: { children: ReactNode }) {
         // Customize Privy's appearance and behavior
         appearance: {
           theme: "dark",
-          accentColor: "#3b82f6",
+          accentColor: "#2b6fd6",
           logo: "/logo.svg",
           showWalletLoginFirst: false,
         },

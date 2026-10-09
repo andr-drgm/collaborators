@@ -28,16 +28,20 @@ const WalletConnect = memo(function WalletConnect({
     setShowWalletModal(false);
   }, []);
 
-  if (!mounted || !ready) return null;
+  if (!mounted || !ready) {
+    return (
+      <div
+        className={`skeleton h-11 w-36 rounded-[var(--radius-control)] ${className}`}
+        aria-hidden="true"
+      ></div>
+    );
+  }
 
   // If not authenticated, show login button
   if (!authenticated) {
     return (
       <div className={`flex items-center gap-4 ${className}`}>
-        <button
-          onClick={login}
-          className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 rounded-xl px-6 py-3 text-sm font-semibold shadow-lg hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105"
-        >
+        <button type="button" onClick={login} className="btn btn-primary">
           Connect Wallet
         </button>
       </div>
@@ -48,8 +52,12 @@ const WalletConnect = memo(function WalletConnect({
   if (!internalWalletAddress) {
     return (
       <div className={`flex items-center gap-4 ${className}`}>
-        <div className="liquid-glass rounded-xl px-4 py-2 border border-yellow-500/30">
-          <span className="text-sm text-yellow-300">Setting up wallet...</span>
+        <div
+          role="status"
+          className="flex items-center gap-2 rounded-[var(--radius-control)] border border-warning/40 bg-warning/10 px-4 py-2"
+        >
+          <span className="h-2 w-2 animate-pulse rounded-full bg-warning"></span>
+          <span className="text-sm text-warning">Setting up wallet...</span>
         </div>
       </div>
     );
@@ -59,33 +67,52 @@ const WalletConnect = memo(function WalletConnect({
     <div className={`flex items-center gap-4 ${className}`}>
       {/* Wallet Display */}
       <button
+        type="button"
         onClick={handleOpenModal}
-        className="flex items-center gap-3 liquid-glass rounded-xl px-4 py-2 border border-white/20 hover:border-white/40 transition-all"
+        aria-haspopup="dialog"
+        className="flex items-center gap-3 rounded-[var(--radius-control)] border border-line-strong bg-surface-strong px-4 py-2 transition-colors hover:border-white/40"
       >
-        <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse shadow-lg"></div>
-        <div className="flex flex-col text-left">
-          <span className="text-xs text-white/60 mb-0.5">Wallet</span>
-          <span className="text-sm font-mono text-white/90 font-medium">
+        <span
+          aria-hidden="true"
+          className="h-2.5 w-2.5 animate-pulse rounded-full bg-success"
+        ></span>
+        <span className="flex flex-col text-left">
+          <span className="text-xs text-subtle">Wallet</span>
+          <span className="font-mono text-sm font-medium text-fg/90">
             {shortenAddress(internalWalletAddress)}
           </span>
-        </div>
+        </span>
       </button>
 
       {/* Wallet Details Modal */}
       {showWalletModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="liquid-glass rounded-2xl p-8 max-w-md w-full mx-4 border border-white/20">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold text-white">Wallet Info</h3>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          onClick={handleCloseModal}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="wallet-modal-title"
+            className="card w-full max-w-md bg-bg/90 p-6 sm:p-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-6 flex items-center justify-between">
+              <h2 id="wallet-modal-title" className="text-xl font-semibold">
+                Wallet Info
+              </h2>
               <button
+                type="button"
                 onClick={handleCloseModal}
-                className="text-white/60 hover:text-white transition-colors"
+                aria-label="Close"
+                className="btn btn-ghost btn-sm px-2"
               >
                 <svg
-                  className="w-6 h-6"
+                  className="h-5 w-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -97,29 +124,32 @@ const WalletConnect = memo(function WalletConnect({
               </button>
             </div>
 
-            {/* Wallet Section */}
-            <div className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                <h4 className="text-sm font-semibold text-white/80">
+            <div className="mb-6 rounded-xl border border-line bg-surface p-4">
+              <div className="mb-3 flex items-center gap-2">
+                <span
+                  aria-hidden="true"
+                  className="h-2 w-2 rounded-full bg-success"
+                ></span>
+                <h3 className="text-sm font-semibold text-muted">
                   Your Wallet (Privy)
-                </h4>
+                </h3>
               </div>
-              <p className="text-xs text-white/60 mb-3">
+              <p className="mb-3 text-xs text-subtle">
                 Your embedded Solana wallet where rewards are accumulated and
                 claimed.
               </p>
-              <div className="bg-black/20 rounded-lg p-3">
-                <p className="text-xs text-white/50 mb-1">Address</p>
-                <p className="text-sm font-mono text-white break-all">
+              <div className="rounded-lg bg-black/30 p-3">
+                <p className="mb-1 text-xs text-subtle">Address</p>
+                <p className="break-all font-mono text-sm text-fg">
                   {internalWalletAddress}
                 </p>
               </div>
             </div>
 
             <button
+              type="button"
               onClick={handleCloseModal}
-              className="w-full bg-white/10 hover:bg-white/20 rounded-lg px-4 py-2 text-sm font-semibold text-white transition-all"
+              className="btn btn-secondary w-full"
             >
               Close
             </button>

@@ -21,12 +21,12 @@ const HeroSection = memo(function HeroSection() {
   }, [authenticated, router]);
 
   return (
-    <section className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
+    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-4 py-16">
+      {/* Animated background */}
+      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
         <RippleGrid
-          enableRainbow={true}
-          gridColor="#0a84ff"
+          enableRainbow={false}
+          gridColor="#2b6fd6"
           rippleIntensity={0.05}
           gridSize={15}
           gridThickness={35}
@@ -36,121 +36,98 @@ const HeroSection = memo(function HeroSection() {
           vignetteStrength={5}
           fadeDistance={0.2}
         />
-        <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute top-20 left-20 h-32 w-32 rounded-full bg-brand-teal/15 blur-3xl animate-float"></div>
         <div
-          className="absolute top-40 right-32 w-24 h-24 bg-gradient-to-br from-teal-500/20 to-purple-500/20 rounded-full blur-3xl animate-float"
+          className="absolute top-40 right-32 h-24 w-24 rounded-full bg-brand-blue/20 blur-3xl animate-float"
           style={{ animationDelay: "2s" }}
         ></div>
         <div
-          className="absolute bottom-32 left-32 w-28 h-28 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full blur-3xl animate-float"
+          className="absolute bottom-32 left-32 h-28 w-28 rounded-full bg-brand-blue/15 blur-3xl animate-float"
           style={{ animationDelay: "4s" }}
         ></div>
       </div>
 
-      {/* Corner accents with refined styling */}
-      <div className="absolute top-10 left-10 w-16 h-16 border-t-2 border-l-2 border-blue-400/60 rounded-tl-xl"></div>
-      <div className="absolute top-10 right-10 w-16 h-16 border-t-2 border-r-2 border-cyan-400/60 rounded-tr-xl"></div>
-      <div className="absolute bottom-10 left-10 w-16 h-16 border-b-2 border-l-2 border-teal-400/60 rounded-bl-xl"></div>
-      <div className="absolute bottom-10 right-10 w-16 h-16 border-b-2 border-r-2 border-blue-400/60 rounded-br-xl"></div>
+      {/* Corner accents */}
+      <div aria-hidden="true" className="hidden sm:block">
+        <div className="absolute top-10 left-10 h-16 w-16 rounded-tl-xl border-t-2 border-l-2 border-brand-teal/50"></div>
+        <div className="absolute top-10 right-10 h-16 w-16 rounded-tr-xl border-t-2 border-r-2 border-brand-blue/50"></div>
+        <div className="absolute bottom-10 left-10 h-16 w-16 rounded-bl-xl border-b-2 border-l-2 border-brand-blue/50"></div>
+        <div className="absolute bottom-10 right-10 h-16 w-16 rounded-br-xl border-b-2 border-r-2 border-brand-teal/50"></div>
+      </div>
 
-      <div className="container max-w-md px-4 z-10">
-        <div className="flex flex-col items-center space-y-8">
-          {/* Logo with enhanced styling */}
-          <div className="relative w-40 h-40 animate-float">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-2xl"></div>
-            <div className="relative w-full h-full">
-              <Image
-                width={100}
-                height={100}
-                alt="Collaborators Logo"
-                decoding="async"
-                data-nimg="fill"
-                className="object-contain relative z-10"
-                style={{
-                  position: "absolute",
-                  height: "100%",
-                  width: "100%",
-                  left: 0,
-                  top: 0,
-                  right: 0,
-                  bottom: 0,
-                }}
-                src="/logo.svg"
-              />
-            </div>
+      <div className="relative z-10 w-full max-w-md">
+        <div className="flex flex-col items-center gap-8 text-center">
+          <div className="relative h-32 w-32 animate-float sm:h-40 sm:w-40">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 rounded-full bg-gradient-to-br from-brand-teal/20 to-brand-blue/20 blur-2xl"
+            ></div>
+            <Image
+              src="/logo.svg"
+              alt="Collaborators logo"
+              width={160}
+              height={160}
+              priority
+              className="relative h-full w-full object-contain"
+            />
           </div>
 
-          {/* Title with gradient text */}
-          <h1 className="text-5xl font-bold tracking-tight gradient-text">
-            Collaborators
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-xl text-center text-white/80 max-w-md leading-relaxed">
-            Transform your open source contributions into on-chain rewards and
-            reputation
-          </p>
-
-          {/* Steps card with liquid glass effect */}
-          <div className="liquid-glass rounded-2xl p-8 max-w-2xl w-full transition-all duration-500 hover:liquid-glass-hover">
-            <h3 className="text-xl font-semibold text-white mb-6 text-center">
-              Get Started in 3 Simple Steps
-            </h3>
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/10">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm font-bold flex items-center justify-center shadow-lg">
-                  1
-                </div>
-                <span className="text-white/90 font-medium">
-                  Log in with GitHub
-                </span>
-              </div>
-              <div className="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/10">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-teal-500 text-white text-sm font-bold flex items-center justify-center shadow-lg">
-                  2
-                </div>
-                <span className="text-white/90 font-medium">
-                  Link your Solana wallet
-                </span>
-              </div>
-              <div className="flex items-center gap-4 p-3 rounded-xl bg-white/5 border border-white/10">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-teal-500 to-purple-500 text-white text-sm font-bold flex items-center justify-center shadow-lg">
-                  3
-                </div>
-                <span className="text-white/90 font-medium">
-                  Start contributing and get rewarded
-                </span>
-              </div>
-            </div>
+          <div className="space-y-4">
+            <h1 className="gradient-text text-4xl font-bold tracking-tight sm:text-5xl">
+              Collaborators
+            </h1>
+            <p className="text-lg leading-relaxed text-muted sm:text-xl">
+              Transform your open source contributions into on-chain rewards and
+              reputation
+            </p>
           </div>
 
-          {/* CTA Button */}
-          <div className="w-full max-w-xs">
-            <button
-              onClick={handleLogin}
-              className="btn-primary w-full py-4 text-lg flex items-center justify-center gap-3 group"
+          <div className="card w-full p-6 sm:p-8">
+            <h2 className="mb-6 text-lg font-semibold text-fg sm:text-xl">
+              Get started in 3 simple steps
+            </h2>
+            <ol className="space-y-3 text-left">
+              {[
+                "Log in with GitHub",
+                "Link your Solana wallet",
+                "Start contributing and get rewarded",
+              ].map((step, i) => (
+                <li
+                  key={step}
+                  className="flex items-center gap-4 rounded-xl border border-line bg-surface p-3"
+                >
+                  <span className="step-num" aria-hidden="true">
+                    {i + 1}
+                  </span>
+                  <span className="font-medium text-fg/90">{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleLogin}
+            className="btn btn-primary btn-lg group w-full max-w-xs"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="h-5 w-5 transition-transform group-hover:scale-110"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-6 h-6 transition-transform group-hover:scale-110"
-              >
-                <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
-                <path d="M9 18c-4.51 2-5-2-7-2"></path>
-              </svg>
-              Start Earning Rewards
-            </button>
-          </div>
+              <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path>
+              <path d="M9 18c-4.51 2-5-2-7-2"></path>
+            </svg>
+            Start Earning Rewards
+          </button>
 
-          {/* Tagline */}
-          <p className="text-white/60 text-center mt-6 text-lg font-medium">
+          <p className="text-base font-medium text-subtle sm:text-lg">
             Collaborate seamlessly. Build together.
           </p>
         </div>
