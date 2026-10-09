@@ -120,6 +120,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // A negative/NaN amount would later be credited to the solver
+    const amount = Number(bountyAmount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return NextResponse.json(
+        { error: "Bounty amount must be greater than 0" },
+        { status: 400 }
+      );
+    }
+
     // Check if bounty already exists for this issue
     const existingBounty = await prisma.bounty.findUnique({
       where: {
@@ -146,7 +155,7 @@ export async function POST(request: NextRequest) {
         githubRepoName,
         title,
         description,
-        bountyAmount: parseFloat(bountyAmount),
+        bountyAmount: amount,
         bountyPosterId: dbUser.id,
         githubIssueUrl,
         githubLabels: ["bounty", "usdc-reward"],

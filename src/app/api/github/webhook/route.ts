@@ -8,23 +8,9 @@ export async function POST(request: NextRequest) {
     const bodyString = await request.text();
     const signature = request.headers.get("x-hub-signature-256");
 
-    console.log(
-      "Webhook received - Secret configured:",
-      !!process.env.GITHUB_WEBHOOK_SECRET
-    );
-    console.log("Signature present:", !!signature);
-
-    // Verify webhook signature (allow bypassing in development)
-    if (process.env.GITHUB_WEBHOOK_SECRET) {
-      const isValid = verifyGitHubWebhook(bodyString, signature);
-      console.log("Signature valid:", isValid);
-      if (!isValid) {
-        console.log(
-          "⚠️ Webhook signature verification failed - this is OK in development"
-        );
-        // Don't reject in development to make testing easier
-        // return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
-      }
+    // Fails closed: also rejects when GITHUB_WEBHOOK_SECRET is unset
+    if (!verifyGitHubWebhook(bodyString, signature)) {
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
     // Parse the body for event handling
@@ -62,6 +48,8 @@ async function handlePingEvent(event: {
   sender: { login: string; id: number };
 }) {
   const { repository, sender } = event;
+  // Org-level webhooks ping without a repository
+  if (!repository) return;
 
   console.log(
     `Webhook ping received for ${repository.full_name} by ${sender.login}`
@@ -138,28 +126,17 @@ async function handleIssueEvent(event: {
       );
     }
   } else if (action === "closed") {
-    // Check if this was a solved bounty
-    const bounty = await prisma.bounty.findUnique({
+    // Issue closed: close the bounty. Solving (and crediting) only happens via a
+    // merged PR, whose event may arrive after this one and still wins.
+    await prisma.bounty.updateMany({
       where: {
-        githubIssueId_githubRepoOwner_githubRepoName: {
-          githubIssueId: issue.number,
-          githubRepoOwner: repository.owner.login,
-          githubRepoName: repository.name,
-        },
+        githubIssueId: issue.number,
+        githubRepoOwner: { equals: repository.owner.login, mode: "insensitive" },
+        githubRepoName: { equals: repository.name, mode: "insensitive" },
+        status: "ACTIVE",
       },
+      data: { status: "CANCELLED" },
     });
-
-    if (bounty && bounty.status === "ACTIVE") {
-      // Mark bounty as solved if it was closed
-      await prisma.bounty.update({
-        where: { id: bounty.id },
-        data: {
-          status: "SOLVED",
-          isSolved: true,
-          solvedAt: new Date(),
-        },
-      });
-    }
   }
 }
 
@@ -168,6 +145,7 @@ interface PullRequestEvent {
   pull_request: {
     number: number;
     merged: boolean;
+    user: { login: string };
   };
   repository: {
     owner: {
@@ -180,65 +158,60 @@ interface PullRequestEvent {
 async function handlePullRequestEvent(event: PullRequestEvent) {
   const { action, pull_request, repository } = event;
 
-  if (action === "closed" && pull_request.merged) {
-    console.log(
-      `PR ${pull_request.number} merged in ${repository.owner.login}/${repository.name}`
-    );
+  if (action !== "closed" || !pull_request.merged) return;
 
-    // Find submissions for this PR in the specific repository
-    const submissions = await prisma.bountySubmission.findMany({
-      where: {
-        prNumber: pull_request.number,
-        status: "PENDING",
-        bounty: {
-          githubRepoOwner: repository.owner.login,
-          githubRepoName: repository.name,
+  // A submission matches when it names this PR number in this repo AND was
+  // made by the PR's author, so nobody can claim someone else's merged PR.
+  const submissions = await prisma.bountySubmission.findMany({
+    where: {
+      prNumber: pull_request.number,
+      status: "PENDING",
+      bounty: {
+        githubRepoOwner: { equals: repository.owner.login, mode: "insensitive" },
+        githubRepoName: { equals: repository.name, mode: "insensitive" },
+      },
+      user: {
+        username: { equals: pull_request.user.login, mode: "insensitive" },
+      },
+    },
+  });
+
+  for (const submission of submissions) {
+    await prisma.$transaction(async (tx) => {
+      // The conditional update is the idempotency guard: a redelivered or
+      // concurrent event matches 0 rows here and credits nothing.
+      const solved = await tx.bounty.updateMany({
+        where: {
+          id: submission.bountyId,
+          isSolved: false,
+          // CANCELLED = the issues.closed event for this fix arrived first
+          status: { in: ["ACTIVE", "CANCELLED"] },
         },
-      },
-      include: {
-        bounty: true,
-      },
+        data: {
+          status: "SOLVED",
+          isSolved: true,
+          solvedAt: new Date(),
+          solvedBy: submission.userId,
+        },
+      });
+      if (solved.count === 0) return;
+
+      const bounty = await tx.bounty.findUniqueOrThrow({
+        where: { id: submission.bountyId },
+      });
+      await tx.bountySubmission.update({
+        where: { id: submission.id },
+        data: { status: "APPROVED", isVerified: true, verifiedAt: new Date() },
+      });
+      await tx.user.update({
+        where: { id: submission.userId },
+        data: { unclaimedTokens: { increment: bounty.bountyAmount } },
+      });
+
+      console.log(
+        `Bounty ${bounty.id} solved by ${submission.userId} via PR #${pull_request.number}, credited ${bounty.bountyAmount}`
+      );
     });
-
-    console.log(
-      `Found ${submissions.length} submissions for PR ${pull_request.number}`
-    );
-
-    for (const submission of submissions) {
-      const bounty = submission.bounty;
-
-      // Repository is already matched by the query, just check if bounty is active
-      if (bounty.status === "ACTIVE") {
-        console.log(
-          `Marking bounty ${bounty.id} as solved by user ${submission.userId}`
-        );
-
-        // Mark submission as verified and bounty as solved
-        await prisma.$transaction([
-          prisma.bountySubmission.update({
-            where: { id: submission.id },
-            data: {
-              status: "APPROVED",
-              isVerified: true,
-              verifiedAt: new Date(),
-            },
-          }),
-          prisma.bounty.update({
-            where: { id: bounty.id },
-            data: {
-              status: "SOLVED",
-              isSolved: true,
-              solvedAt: new Date(),
-              solvedBy: submission.userId,
-            },
-          }),
-        ]);
-
-        console.log(
-          `✅ Bounty ${bounty.id} (Issue #${bounty.githubIssueId}) solved by user ${submission.userId}`
-        );
-      }
-    }
   }
 }
 
