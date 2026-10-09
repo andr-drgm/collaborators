@@ -75,7 +75,7 @@ const HeroSection = memo(function HeroSection() {
                   right: 0,
                   bottom: 0,
                 }}
-                src="/logo.png"
+                src="/logo.svg"
               />
             </div>
           </div>
