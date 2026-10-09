@@ -13,7 +13,7 @@ export default function PrivyProviders({ children }: { children: ReactNode }) {
         appearance: {
           theme: "dark",
           accentColor: "#3b82f6",
-          logo: "/logo.png",
+          logo: "/logo.svg",
           showWalletLoginFirst: false,
         },
         // Configure login methods
