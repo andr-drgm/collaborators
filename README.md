@@ -1,180 +1,253 @@
-# Collaborator
+# Collaborators
 
-Transform your GitHub work into on-chain rewards and reputation. Earn NFT badges and SOL tokens for your real contributions on GitHub.
+Collaborators is a GitHub bounty marketplace for funding open-source work and
+rewarding accepted pull requests in USDC. Maintainers attach bounties to GitHub
+issues, contributors submit a pull request as their solution, and repository
+webhooks keep the bounty status in sync when the work is merged.
 
-## 🚀 What We've Built
+> **Project status:** this repository contains the bounty-focused MVP. Parts of
+> the original contribution-tracking product remain under `archive/`
+> directories, but they are not part of the active dashboard.
 
-Collaborators is a Web3 platform that automatically converts your GitHub activity into verifiable on-chain achievements. Every meaningful contribution mints NFT badges and earns SOL tokens, helping you build your on-chain reputation while getting rewarded for open-source collaboration.
+## How it works
 
-## ✨ Key Features
+```mermaid
+flowchart LR
+    A["Maintainer selects a GitHub issue"] --> B["Creates a USDC bounty"]
+    B --> C["Contributor opens a pull request"]
+    C --> D["Contributor submits the PR URL"]
+    D --> E["Repository webhook observes the merge"]
+    E --> F["Submission is approved and bounty is solved"]
+```
 
-- **GitHub Integration**: Seamlessly connect your GitHub account to track contributions
-- **Automatic Rewards**: Earn SOL tokens for commits, pull requests, reviews, and issue resolution
-- **NFT Badges**: Unique digital credentials minted for your achievements
-- **On-Chain Reputation**: Verifiable proof of your contributions stored on Solana blockchain
-- **Real-Time Tracking**: Monitor your contribution activity with GitHub-style heatmaps
-- **Secure Wallet Integration**: Support for Phantom, Solflare, and other Solana wallets
+1. Sign in with GitHub. Privy handles authentication and creates an embedded
+   Solana wallet for users who do not already have one.
+2. Search public GitHub issues or browse the issues you created.
+3. Add a USDC-denominated bounty to an issue and configure the repository
+   webhook.
+4. A contributor solves the issue and submits the pull request URL from the
+   bounty card.
+5. When GitHub reports that the pull request was merged, Collaborators approves
+   the matching submission and marks the bounty as solved.
 
-## 🎯 How It Works
+## Features
 
-1. **Connect GitHub**: Log in with your GitHub account
-2. **Link Wallet**: Connect your Solana wallet (Phantom, Solflare, etc.)
-3. **Start Contributing**: Continue your normal GitHub workflow
-4. **Get Rewarded**: Earn tokens and NFT badges automatically
+- GitHub OAuth through Privy
+- Embedded Solana wallet creation on first login
+- Public GitHub issue search and personal issue discovery
+- USDC-denominated bounty creation, editing, filtering, and deletion
+- Pull request solution submissions
+- GitHub webhook tracking for issues and pull requests
+- Automatic submission verification after a matching pull request is merged
+- Separate views for active bounties, solved bounties, personal issues, and
+  bounties you posted
+- Responsive dark interface built with Tailwind CSS
 
-## 🛠️ Technical Stack
+## Technology
 
-- **Frontend**: Next.js 14, React, TypeScript
-- **Styling**: Tailwind CSS with custom design system
-- **Blockchain**: Solana blockchain integration
-- **Authentication**: NextAuth.js with GitHub OAuth
-- **Database**: Prisma with PostgreSQL
-- **Deployment**: Vercel-ready configuration
+| Area | Implementation |
+| --- | --- |
+| Web application | Next.js 15 App Router, React 19, TypeScript |
+| Styling | Tailwind CSS 4 |
+| Authentication | Privy with GitHub OAuth |
+| Wallets | Privy embedded Solana wallets, Solana Web3.js |
+| GitHub integration | Octokit and GitHub webhooks |
+| Data | PostgreSQL with Prisma 6 |
+| Deployment | Vercel configuration included |
 
-## 🚀 Getting Started
+## Local development
 
 ### Prerequisites
 
-- Node.js 18+ and pnpm
-- Solana wallet (Phantom, Solflare, etc.)
-- GitHub account
-- Some SOL for transaction fees
+- Node.js 20 or newer
+- pnpm
+- PostgreSQL
+- A Privy application with GitHub login and Solana embedded wallets enabled
+- A GitHub token for issue search and label operations
 
-### Development Setup
-
-This project uses Git hooks to ensure code quality. When you clone the repository, the following will be automatically set up:
-
-- **Pre-commit hooks**: Automatically runs `pnpm lint` before each commit
-- **Code formatting**: Ensures consistent code style across the project
-
-The hooks are managed by Husky and will be installed automatically when you run `pnpm install`.
-
-### Installation
-
-1. Clone the repository:
+### 1. Clone and install
 
 ```bash
-git clone https://github.com/yourusername/the-collaborator.git
-cd the-collaborator
-```
-
-2. Install dependencies:
-
-```bash
+git clone https://github.com/andr-drgm/collaborators.git
+cd collaborators
 pnpm install
 ```
 
-3. Set up environment variables:
+### 2. Configure Privy
+
+In the [Privy dashboard](https://dashboard.privy.io/):
+
+1. Enable GitHub as a login method.
+2. Enable **Return OAuth tokens** for GitHub. The personal-issues view needs the
+   returned token to call the GitHub API for the signed-in user.
+3. Enable Solana embedded wallets and create them for users without wallets.
+4. Add `http://localhost:3000` to the allowed application domains.
+
+Privy's GitHub callback URL is:
+
+```text
+https://auth.privy.io/api/v1/oauth/github/callback
+```
+
+### 3. Add environment variables
+
+Create `.env.local` in the project root:
+
+```dotenv
+# PostgreSQL
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/collaborators"
+
+# Privy
+NEXT_PUBLIC_PRIVY_APP_ID="your-privy-app-id"
+PRIVY_APP_SECRET="your-privy-app-secret"
+
+# GitHub API access
+GITHUB_TOKEN="your-github-token"
+
+# Use the same value in the GitHub repository webhook settings
+GITHUB_WEBHOOK_SECRET="replace-with-a-long-random-secret"
+```
+
+Optional configuration:
+
+```dotenv
+# Fallback token used by the personal-issues endpoint
+GITHUB_ACCESS_TOKEN="your-github-token"
+
+# Footer links
+NEXT_PUBLIC_X_URL="https://x.com/collaborat0rs"
+NEXT_PUBLIC_PRIVACY_URL="https://example.com/privacy"
+NEXT_PUBLIC_TERMS_URL="https://example.com/terms"
+```
+
+Keep server secrets out of variables prefixed with `NEXT_PUBLIC_`, and never
+commit `.env.local`.
+
+### 4. Prepare the database
 
 ```bash
-cp .env.example .env.local
+pnpm prisma generate
+pnpm prisma db push
 ```
 
-4. Configure your environment variables:
-
-```env
-# GitHub OAuth
-GITHUB_ID=your_github_client_id
-GITHUB_SECRET=your_github_client_secret
-
-# NextAuth
-NEXTAUTH_SECRET=your_nextauth_secret
-NEXTAUTH_URL=http://localhost:3000
-
-# Solana
-REACT_APP_MINT_AUTHORITY_SECRET_KEY=your_mint_authority_key
-```
-
-5. Run the development server:
+### 5. Start the app
 
 ```bash
 pnpm dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser
+Open [http://localhost:3000](http://localhost:3000).
 
-## 🔧 Configuration
+## GitHub webhook setup
 
-### GitHub OAuth Setup
+Each repository that uses bounty automation needs a webhook:
 
-1. Go to GitHub Developer Settings
-2. Create a new OAuth App
-3. Set the callback URL to `http://localhost:3000/api/auth/callback/github`
-4. Copy the Client ID and Client Secret to your `.env.local`
+1. Open the repository's **Settings → Webhooks → Add webhook** page.
+2. Set **Payload URL** to `https://your-domain.example/api/github/webhook`.
+3. Choose `application/json` as the content type.
+4. Enter the same secret as `GITHUB_WEBHOOK_SECRET`.
+5. Select individual events and enable **Issues** and **Pull requests**.
+6. Keep the webhook active and add it.
 
-### Solana Configuration
+The endpoint handles these events:
 
-1. Set up a Solana wallet with some SOL
-2. Configure your mint authority for token distribution
-3. Update the mint address in the dashboard component
+| Event | Result |
+| --- | --- |
+| `ping` | Registers the repository for the GitHub user |
+| `issues` | Updates a matching bounty when its issue changes state |
+| `pull_request` | Solves a bounty when its submitted PR is merged |
 
-## 📱 User Experience Improvements
+For local webhook testing, expose port `3000` through an HTTPS tunnel and use
+the tunnel URL as the payload URL.
 
-### For Newcomers
+## Project structure
 
-- **Clear Value Proposition**: "Transform GitHub work into on-chain rewards and reputation"
-- **Key Terms Explained**: Hover tooltips for SOL tokens, NFT badges, and on-chain reputation
-- **Simple Steps**: 3-step onboarding process clearly explained
-- **Visual Flowchart**: Step-by-step process visualization
+```text
+prisma/
+├── schema.prisma                  # PostgreSQL data model
+└── migrations/                    # Database changes
+src/
+├── app/
+│   ├── api/
+│   │   ├── bounties/              # Bounty CRUD and submissions
+│   │   ├── github/                # Issue search, labels, and webhooks
+│   │   └── user/                  # Authenticated user sync
+│   ├── dashboard/                 # Marketplace dashboard
+│   └── PrivyProviders.tsx         # Privy and embedded-wallet config
+├── components/                    # Landing page and dashboard UI
+├── hooks/usePrivyAuth.ts          # Client authentication state
+├── lib/                           # Privy and webhook helpers
+└── services/github.ts             # Client-side GitHub API helpers
+```
 
-### For Web3 Developers
+## Main API routes
 
-- **Advanced Features**: Detailed contribution tracking and analytics
-- **Technical Details**: Comprehensive dashboard with GitHub-style heatmaps
-- **Wallet Integration**: Seamless Solana wallet connection
-- **Real-Time Updates**: Live contribution tracking and reward calculation
+| Route | Purpose |
+| --- | --- |
+| `GET /api/bounties` | List and filter bounties |
+| `POST /api/bounties` | Create a bounty for a GitHub issue |
+| `PATCH /api/bounties/:id` | Update a bounty you posted |
+| `DELETE /api/bounties/:id` | Delete a bounty you posted |
+| `POST /api/bounties/submissions` | Submit a PR for an active bounty |
+| `GET /api/github/search/issues` | Search public GitHub issues |
+| `GET /api/github/user/issues` | List the signed-in user's issues |
+| `POST /api/github/webhook` | Process repository webhook events |
+| `GET /api/user/me` | Verify the Privy token and sync the local user record |
 
-### Trust & Security
+Authenticated routes expect a Privy access token:
 
-- **Security Information**: Clear explanations of data privacy and wallet security
-- **FAQ Section**: Common questions about tracking, rewards, and supported wallets
-- **Help Tooltips**: Contextual assistance throughout the platform
-- **Onboarding Guidance**: Step-by-step help for wallet setup
+```http
+Authorization: Bearer <privy-access-token>
+```
 
-## 🎨 Design System
+## Development checks
 
-- **Color Palette**: Cyan to teal gradients with dark theme
-- **Typography**: Geist Sans and Geist Mono fonts
-- **Components**: Consistent card designs with hover effects
-- **Responsive**: Mobile-first design with desktop optimizations
-- **Accessibility**: High contrast ratios and keyboard navigation
+Run a type check and lint the source before opening a pull request:
 
-## 🔮 Coming Soon
+```bash
+pnpm exec tsc --noEmit
+pnpm exec eslint .
+```
 
-- **Team Leaderboards**: Compete with your team and climb the ranks
-- **Exclusive NFT Tiers**: Rare collectibles for top contributors
-- **API Access**: Integrate rewards into your own applications
-- **Multi-Chain Support**: Expand beyond Solana to other blockchains
+To verify a production build, provide the required environment variables and a
+reachable PostgreSQL database, then run:
 
-## 🤝 Contributing
+```bash
+pnpm build
+```
 
-We welcome contributions! Please see our contributing guidelines for details on:
+## Security notes
 
-- Code style and standards
-- Testing requirements
-- Pull request process
-- Community guidelines
+- Give GitHub tokens only the permissions required by the repositories and
+  operations you use.
+- Store `PRIVY_APP_SECRET`, GitHub tokens, database credentials, and the webhook
+  secret only in server-side secret storage.
+- Always configure a unique webhook secret for production deployments.
+- Review OAuth permissions before authorizing the application, especially when
+  private repositories are accessible to the selected GitHub account.
+- Do not put wallet private keys or mint authority secrets in client-exposed
+  environment variables.
 
-## 📄 License
+## Contributing
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+1. Fork the repository and create a focused branch.
+2. Keep changes scoped and document any new environment variables or migrations.
+3. Run the development checks above.
+4. Open a pull request that explains the behavior change and how it was
+   verified.
 
-## 🆘 Support
+Bug reports and feature proposals are welcome in [GitHub Issues].
 
-- **Documentation**: Check this README and inline help tooltips
-- **Issues**: Report bugs or feature requests via GitHub Issues
-- **Discussions**: Join community discussions for help and ideas
-- **Email**: Contact the team directly for urgent matters
+[GitHub Issues]: https://github.com/andr-drgm/collaborators/issues
 
-## 🌟 Acknowledgments
+## Additional documentation
 
-- Solana Foundation for blockchain infrastructure
-- GitHub for developer platform integration
-- Next.js team for the amazing framework
-- Our community of contributors and testers
+- [`PRIVY_SETUP.md`](PRIVY_SETUP.md) explains the authentication and
+  embedded-wallet configuration in more detail.
+- [`MIGRATION_SUMMARY.md`](MIGRATION_SUMMARY.md) describes the shift from
+  contribution tracking to the current bounty marketplace MVP.
 
----
+## License
 
-**Collaborators** - Building the future of developer collaboration and rewards.
-
-_Transform your contributions. Build your reputation. Get rewarded._
+No license file is currently included in this repository. Until the maintainers
+add one, normal copyright rules apply.
