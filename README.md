@@ -1,180 +1,193 @@
-# Collaborator
+# Collaborators 🚀
 
-Transform your GitHub work into on-chain rewards and reputation. Earn NFT badges and SOL tokens for your real contributions on GitHub.
+> **The Decentralized GitHub Bounty Marketplace.**  
+> Turn open-source GitHub issues into escrow-backed USDC bounties on Solana. Solve problems, submit pull requests, and get paid instantly upon merge.
 
-## 🚀 What We've Built
+[![Live App](https://img.shields.io/badge/Live%20App-collaborators.build-14F195?style=flat&logo=solana)](https://collaborators.build)
+[![Next.js](https://img.shields.io/badge/Next.js-15.3.2-black?style=flat&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.1.0-61DAFB?style=flat&logo=react)](https://react.dev/)
+[![Solana](https://img.shields.io/badge/Solana-Web3.js-9945FF?style=flat&logo=solana)](https://solana.com/)
+[![Privy](https://img.shields.io/badge/Auth-Privy-indigo)](https://privy.io/)
+[![Prisma](https://img.shields.io/badge/ORM-Prisma%206-2D3748?style=flat&logo=prisma)](https://prisma.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Collaborators is a Web3 platform that automatically converts your GitHub activity into verifiable on-chain achievements. Every meaningful contribution mints NFT badges and earns SOL tokens, helping you build your on-chain reputation while getting rewarded for open-source collaboration.
+---
+
+## 📖 Overview
+
+**Collaborators** bridges open-source software development with Web3 micro-incentives. Project maintainers and community sponsors can attach guaranteed **USDC bounties** to any public GitHub issue. Developers worldwide can discover bounties, resolve issues, and receive automated on-chain payouts the moment their Pull Request is merged.
+
+No manual invoice chasing. No middlemen. Just code, merge, and get rewarded.
+
+---
 
 ## ✨ Key Features
 
-- **GitHub Integration**: Seamlessly connect your GitHub account to track contributions
-- **Automatic Rewards**: Earn SOL tokens for commits, pull requests, reviews, and issue resolution
-- **NFT Badges**: Unique digital credentials minted for your achievements
-- **On-Chain Reputation**: Verifiable proof of your contributions stored on Solana blockchain
-- **Real-Time Tracking**: Monitor your contribution activity with GitHub-style heatmaps
-- **Secure Wallet Integration**: Support for Phantom, Solflare, and other Solana wallets
+- **Guaranteed Escrow in USDC**: Bounties are funded upfront and held in smart escrow, ensuring solvers always get paid when their solution is accepted.
+- **GitHub-Native Workflow**: Connect via GitHub, browse issues, and submit solutions directly through normal Git pull requests.
+- **Instant Settlement on Merge**: Integrated GitHub webhooks detect when a PR closes an issue, automatically releasing USDC directly to the solver's Solana wallet.
+- **Seamless Web3 Onboarding with Privy**: Frictionless login connecting your GitHub account with embedded or external Solana wallets (Phantom, Solflare, Backpack).
+- **Public & Multi-Repo Support**: Fund and solve issues across any public GitHub repository.
 
-## 🎯 How It Works
+---
 
-1. **Connect GitHub**: Log in with your GitHub account
-2. **Link Wallet**: Connect your Solana wallet (Phantom, Solflare, etc.)
-3. **Start Contributing**: Continue your normal GitHub workflow
-4. **Get Rewarded**: Earn tokens and NFT badges automatically
+## 🔄 How It Works
+
+```
+┌───────────────────────────┐         ┌───────────────────────────┐
+│   Maintainer / Sponsor    │         │   Contributor / Solver    │
+└─────────────┬─────────────┘         └─────────────┬─────────────┘
+              │                                     │
+     1. Connect Wallet & GitHub            2. Browse Active Bounties
+              │                                     │
+     3. Fund Issue with USDC (Escrow)      4. Fork Repo & Write Fix
+              │                                     │
+     5. Set Up GitHub Webhook              6. Open PR with Solution
+              │                                     │
+              └───────────────► 7. Review & Merge ◄─┘
+                                       │
+                         8. Webhook Detects PR Merge
+                                       │
+                  9. Smart Escrow Releases USDC to Solver's Wallet! 💸
+```
+
+### 1. For Bounty Posters (Maintainers & Sponsors)
+1. **Connect**: Log in at [collaborators.build](https://collaborators.build) using your GitHub account and connect your Solana wallet.
+2. **Select Issue**: Search and select any issue from your repositories or public projects.
+3. **Fund Bounty**: Set the bounty reward amount in USDC and deposit to escrow.
+4. **Automate Tracking**: Add the webhook URL `https://collaborators.build/api/github/webhook` to your repository settings with `Issues` and `Pull requests` events enabled.
+
+### 2. For Bounty Solvers (Contributors)
+1. **Explore**: Browse open bounties on the [Active Bounties](https://collaborators.build) dashboard.
+2. **Build**: Fork the repository, create a branch, write clean code, and run tests.
+3. **Submit**: Open a Pull Request referencing the issue (e.g., `Closes #40`) and submit your PR URL on the Collaborators dashboard.
+4. **Earn**: When the maintainer approves and merges your PR, the webhook triggers the payment release directly to your connected wallet.
+
+---
 
 ## 🛠️ Technical Stack
 
-- **Frontend**: Next.js 14, React, TypeScript
-- **Styling**: Tailwind CSS with custom design system
-- **Blockchain**: Solana blockchain integration
-- **Authentication**: NextAuth.js with GitHub OAuth
-- **Database**: Prisma with PostgreSQL
-- **Deployment**: Vercel-ready configuration
+| Layer | Technologies |
+|---|---|
+| **Framework** | [Next.js 15.3](https://nextjs.org/) (App Router, Turbopack) |
+| **Frontend Library** | [React 19](https://react.dev/) |
+| **Styling & FX** | [Tailwind CSS v4](https://tailwindcss.com/), [GSAP](https://greensock.com/), [OGL](https://github.com/oframe/ogl) |
+| **Authentication** | [@privy-io/react-auth](https://privy.io/) & `@privy-io/server-auth` |
+| **Blockchain** | [Solana Web3.js](https://solana-labs.github.io/solana-web3.js/), [@solana/spl-token](https://spl.solana.com/token) (USDC) |
+| **Database & ORM** | [PostgreSQL](https://www.postgresql.org/), [Prisma ORM 6](https://www.prisma.io/) |
+| **GitHub API** | [@octokit/core](https://github.com/octokit/core.js), GitHub Webhooks API |
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
+## 📁 Repository Structure
 
-- Node.js 18+ and pnpm
-- Solana wallet (Phantom, Solflare, etc.)
-- GitHub account
-- Some SOL for transaction fees
-
-### Development Setup
-
-This project uses Git hooks to ensure code quality. When you clone the repository, the following will be automatically set up:
-
-- **Pre-commit hooks**: Automatically runs `pnpm lint` before each commit
-- **Code formatting**: Ensures consistent code style across the project
-
-The hooks are managed by Husky and will be installed automatically when you run `pnpm install`.
-
-### Installation
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/yourusername/the-collaborator.git
-cd the-collaborator
+```
+the-collaborator/
+├── prisma/
+│   └── schema.prisma         # Database schema (Users, Bounties, Repositories, Solutions)
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── bounties/     # Bounty creation, funding & lifecycle endpoints
+│   │   │   ├── github/
+│   │   │   │   └── webhook/  # Webhook handler listening to PR merge & issue events
+│   │   │   └── user/         # User profile and wallet management
+│   │   ├── dashboard/        # Main bounty marketplace dashboard
+│   │   ├── layout.tsx        # App root layout with PrivyProvider & theme
+│   │   └── page.tsx          # Landing page with WebGL shaders & marketing copy
+│   ├── components/
+│   │   ├── dashboard/        # Active bounties, issue search, and solver modals
+│   │   ├── ui/               # Reusable UI components & cards
+│   │   └── wallet/           # Solana wallet connectors
+│   └── lib/                  # Database, Octokit & Solana escrow utility clients
 ```
 
-2. Install dependencies:
+---
 
+## 🚀 Getting Started (Local Development)
+
+### Prerequisites
+- **Node.js**: v20.x or higher
+- **Package Manager**: `pnpm` (`npm install -g pnpm`)
+- **PostgreSQL Database**: Local instance or hosted (Neon, Supabase)
+- **Privy Account**: Application ID & App Secret from [dashboard.privy.io](https://dashboard.privy.io)
+- **Solana Wallet / Devnet RPC**: Phantom, Solflare, or a local keypair for testing
+
+### 1. Clone & Install
 ```bash
+git clone https://github.com/andr-drgm/collaborators.git
+cd collaborators
 pnpm install
 ```
 
-3. Set up environment variables:
-
-```bash
-cp .env.example .env.local
-```
-
-4. Configure your environment variables:
+### 2. Environment Configuration
+Create a `.env.local` file in the root directory:
 
 ```env
-# GitHub OAuth
-GITHUB_ID=your_github_client_id
-GITHUB_SECRET=your_github_client_secret
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/collaborators?schema=public"
 
-# NextAuth
-NEXTAUTH_SECRET=your_nextauth_secret
-NEXTAUTH_URL=http://localhost:3000
+# Privy Authentication
+NEXT_PUBLIC_PRIVY_APP_ID="your_privy_app_id"
+PRIVY_APP_SECRET="your_privy_app_secret"
 
-# Solana
-REACT_APP_MINT_AUTHORITY_SECRET_KEY=your_mint_authority_key
+# Solana & Escrow
+NEXT_PUBLIC_SOLANA_RPC_URL="https://api.devnet.solana.com"
+NEXT_PUBLIC_USDC_MINT_ADDRESS="4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU" # Devnet USDC
+ESCROW_AUTHORITY_SECRET_KEY="[your_solana_private_key_array]"
+
+# GitHub Webhook
+GITHUB_WEBHOOK_SECRET="your_custom_webhook_secret"
 ```
 
-5. Run the development server:
+### 3. Initialize Database
+```bash
+pnpm prisma generate
+pnpm prisma db push
+```
 
+### 4. Run Development Server
 ```bash
 pnpm dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser
-
-## 🔧 Configuration
-
-### GitHub OAuth Setup
-
-1. Go to GitHub Developer Settings
-2. Create a new OAuth App
-3. Set the callback URL to `http://localhost:3000/api/auth/callback/github`
-4. Copy the Client ID and Client Secret to your `.env.local`
-
-### Solana Configuration
-
-1. Set up a Solana wallet with some SOL
-2. Configure your mint authority for token distribution
-3. Update the mint address in the dashboard component
-
-## 📱 User Experience Improvements
-
-### For Newcomers
-
-- **Clear Value Proposition**: "Transform GitHub work into on-chain rewards and reputation"
-- **Key Terms Explained**: Hover tooltips for SOL tokens, NFT badges, and on-chain reputation
-- **Simple Steps**: 3-step onboarding process clearly explained
-- **Visual Flowchart**: Step-by-step process visualization
-
-### For Web3 Developers
-
-- **Advanced Features**: Detailed contribution tracking and analytics
-- **Technical Details**: Comprehensive dashboard with GitHub-style heatmaps
-- **Wallet Integration**: Seamless Solana wallet connection
-- **Real-Time Updates**: Live contribution tracking and reward calculation
-
-### Trust & Security
-
-- **Security Information**: Clear explanations of data privacy and wallet security
-- **FAQ Section**: Common questions about tracking, rewards, and supported wallets
-- **Help Tooltips**: Contextual assistance throughout the platform
-- **Onboarding Guidance**: Step-by-step help for wallet setup
-
-## 🎨 Design System
-
-- **Color Palette**: Cyan to teal gradients with dark theme
-- **Typography**: Geist Sans and Geist Mono fonts
-- **Components**: Consistent card designs with hover effects
-- **Responsive**: Mobile-first design with desktop optimizations
-- **Accessibility**: High contrast ratios and keyboard navigation
-
-## 🔮 Coming Soon
-
-- **Team Leaderboards**: Compete with your team and climb the ranks
-- **Exclusive NFT Tiers**: Rare collectibles for top contributors
-- **API Access**: Integrate rewards into your own applications
-- **Multi-Chain Support**: Expand beyond Solana to other blockchains
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our contributing guidelines for details on:
-
-- Code style and standards
-- Testing requirements
-- Pull request process
-- Community guidelines
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-- **Documentation**: Check this README and inline help tooltips
-- **Issues**: Report bugs or feature requests via GitHub Issues
-- **Discussions**: Join community discussions for help and ideas
-- **Email**: Contact the team directly for urgent matters
-
-## 🌟 Acknowledgments
-
-- Solana Foundation for blockchain infrastructure
-- GitHub for developer platform integration
-- Next.js team for the amazing framework
-- Our community of contributors and testers
+Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
 
 ---
 
-**Collaborators** - Building the future of developer collaboration and rewards.
+## 🔔 GitHub Webhook Setup Guide
 
-_Transform your contributions. Build your reputation. Get rewarded._
+To automate bounty payouts when PRs are merged:
+
+1. Go to your repository on GitHub: `Settings` → `Webhooks` → `Add webhook`.
+2. **Payload URL**: `https://collaborators.build/api/github/webhook`
+3. **Content type**: `application/json`
+4. **Secret**: Enter your `GITHUB_WEBHOOK_SECRET` (optional but recommended).
+5. **Which events would you like to trigger this webhook?**:
+   - Select **Let me select individual events**.
+   - Check **Issues**.
+   - Check **Pull requests**.
+6. Click **Add webhook**.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+1. Fork this repository.
+2. Create a feature branch (`git checkout -b feat/my-improvement`).
+3. Commit your changes with clear messages (`git commit -m 'feat: add feature'`).
+4. Push to your branch (`git push origin feat/my-improvement`).
+5. Open a Pull Request referencing any relevant issues.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+  <sub>Built for the open-source community by <a href="https://collaborators.build">Collaborators.build</a>.</sub>
+</div>
