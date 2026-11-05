@@ -1,180 +1,208 @@
-# Collaborator
+<div align="center">
 
-Transform your GitHub work into on-chain rewards and reputation. Earn NFT badges and SOL tokens for your real contributions on GitHub.
+# Collaborators
 
-## 🚀 What We've Built
+**Turn your open-source contributions into on-chain USDC rewards.**
 
-Collaborators is a Web3 platform that automatically converts your GitHub activity into verifiable on-chain achievements. Every meaningful contribution mints NFT badges and earns SOL tokens, helping you build your on-chain reputation while getting rewarded for open-source collaboration.
+GitHub issue bounties — funded in USDC, paid automatically when your PR merges.
 
-## ✨ Key Features
+[Open a Bounty →](https://collaborators.build) · [Browse Bounties →](https://collaborators.build) · [Discord →](#)
 
-- **GitHub Integration**: Seamlessly connect your GitHub account to track contributions
-- **Automatic Rewards**: Earn SOL tokens for commits, pull requests, reviews, and issue resolution
-- **NFT Badges**: Unique digital credentials minted for your achievements
-- **On-Chain Reputation**: Verifiable proof of your contributions stored on Solana blockchain
-- **Real-Time Tracking**: Monitor your contribution activity with GitHub-style heatmaps
-- **Secure Wallet Integration**: Support for Phantom, Solflare, and other Solana wallets
-
-## 🎯 How It Works
-
-1. **Connect GitHub**: Log in with your GitHub account
-2. **Link Wallet**: Connect your Solana wallet (Phantom, Solflare, etc.)
-3. **Start Contributing**: Continue your normal GitHub workflow
-4. **Get Rewarded**: Earn tokens and NFT badges automatically
-
-## 🛠️ Technical Stack
-
-- **Frontend**: Next.js 14, React, TypeScript
-- **Styling**: Tailwind CSS with custom design system
-- **Blockchain**: Solana blockchain integration
-- **Authentication**: NextAuth.js with GitHub OAuth
-- **Database**: Prisma with PostgreSQL
-- **Deployment**: Vercel-ready configuration
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js 18+ and pnpm
-- Solana wallet (Phantom, Solflare, etc.)
-- GitHub account
-- Some SOL for transaction fees
-
-### Development Setup
-
-This project uses Git hooks to ensure code quality. When you clone the repository, the following will be automatically set up:
-
-- **Pre-commit hooks**: Automatically runs `pnpm lint` before each commit
-- **Code formatting**: Ensures consistent code style across the project
-
-The hooks are managed by Husky and will be installed automatically when you run `pnpm install`.
-
-### Installation
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/yourusername/the-collaborator.git
-cd the-collaborator
-```
-
-2. Install dependencies:
-
-```bash
-pnpm install
-```
-
-3. Set up environment variables:
-
-```bash
-cp .env.example .env.local
-```
-
-4. Configure your environment variables:
-
-```env
-# GitHub OAuth
-GITHUB_ID=your_github_client_id
-GITHUB_SECRET=your_github_client_secret
-
-# NextAuth
-NEXTAUTH_SECRET=your_nextauth_secret
-NEXTAUTH_URL=http://localhost:3000
-
-# Solana
-REACT_APP_MINT_AUTHORITY_SECRET_KEY=your_mint_authority_key
-```
-
-5. Run the development server:
-
-```bash
-pnpm dev
-```
-
-6. Open [http://localhost:3000](http://localhost:3000) in your browser
-
-## 🔧 Configuration
-
-### GitHub OAuth Setup
-
-1. Go to GitHub Developer Settings
-2. Create a new OAuth App
-3. Set the callback URL to `http://localhost:3000/api/auth/callback/github`
-4. Copy the Client ID and Client Secret to your `.env.local`
-
-### Solana Configuration
-
-1. Set up a Solana wallet with some SOL
-2. Configure your mint authority for token distribution
-3. Update the mint address in the dashboard component
-
-## 📱 User Experience Improvements
-
-### For Newcomers
-
-- **Clear Value Proposition**: "Transform GitHub work into on-chain rewards and reputation"
-- **Key Terms Explained**: Hover tooltips for SOL tokens, NFT badges, and on-chain reputation
-- **Simple Steps**: 3-step onboarding process clearly explained
-- **Visual Flowchart**: Step-by-step process visualization
-
-### For Web3 Developers
-
-- **Advanced Features**: Detailed contribution tracking and analytics
-- **Technical Details**: Comprehensive dashboard with GitHub-style heatmaps
-- **Wallet Integration**: Seamless Solana wallet connection
-- **Real-Time Updates**: Live contribution tracking and reward calculation
-
-### Trust & Security
-
-- **Security Information**: Clear explanations of data privacy and wallet security
-- **FAQ Section**: Common questions about tracking, rewards, and supported wallets
-- **Help Tooltips**: Contextual assistance throughout the platform
-- **Onboarding Guidance**: Step-by-step help for wallet setup
-
-## 🎨 Design System
-
-- **Color Palette**: Cyan to teal gradients with dark theme
-- **Typography**: Geist Sans and Geist Mono fonts
-- **Components**: Consistent card designs with hover effects
-- **Responsive**: Mobile-first design with desktop optimizations
-- **Accessibility**: High contrast ratios and keyboard navigation
-
-## 🔮 Coming Soon
-
-- **Team Leaderboards**: Compete with your team and climb the ranks
-- **Exclusive NFT Tiers**: Rare collectibles for top contributors
-- **API Access**: Integrate rewards into your own applications
-- **Multi-Chain Support**: Expand beyond Solana to other blockchains
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our contributing guidelines for details on:
-
-- Code style and standards
-- Testing requirements
-- Pull request process
-- Community guidelines
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-- **Documentation**: Check this README and inline help tooltips
-- **Issues**: Report bugs or feature requests via GitHub Issues
-- **Discussions**: Join community discussions for help and ideas
-- **Email**: Contact the team directly for urgent matters
-
-## 🌟 Acknowledgments
-
-- Solana Foundation for blockchain infrastructure
-- GitHub for developer platform integration
-- Next.js team for the amazing framework
-- Our community of contributors and testers
+</div>
 
 ---
 
-**Collaborators** - Building the future of developer collaboration and rewards.
+## 🎯 What is Collaborators?
 
-_Transform your contributions. Build your reputation. Get rewarded._
+Collaborators is a **GitHub-native USDC bounty marketplace** that turns open-source issue solving into a paid gig. Project maintainers fund issues with USDC; developers solve them with pull requests; payments release **automatically** when the PR merges.
+
+**No escrow intermediaries. No manual payout. No chasing invoices.**
+
+USDC is held in on-chain escrow from the moment a bounty is posted. When your PR is merged on GitHub, our bot verifies the link, releases the USDC, and pays your connected Phantom wallet — usually within minutes.
+
+---
+
+## ⚡ How It Works (4 Steps)
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  1. Fund Bounty │ →  │  2. Developer   │ →  │  3. PR Merged   │ →  │  4. USDC Paid   │
+│                 │    │   Submits PR    │    │   on GitHub     │    │   to Wallet     │
+│  Issue + USDC   │    │  claims & codes │    │   bot verifies  │    │  usually <5 min │
+└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+1. **Post a bounty** — Add USDC to any public GitHub issue. Funds sit in on-chain escrow.
+2. **Developer claims** — A contributor comments intent and submits a pull request that closes the issue.
+3. **PR merges** — Once your PR is merged on GitHub, our webhook verifies the connection.
+4. **Auto-pay** — USDC is released from escrow directly to the contributor's connected Phantom wallet.
+
+---
+
+## 🏆 Featured Bounty Programs
+
+> Open bounties sponsored by leading AI labs and developer tools.
+
+<p align="center">
+  <a href="https://github.com/sponsors/anthropics"><img src="https://img.shields.io/badge/Anthropic-Prize%20Sponsor-D4A574?style=for-the-badge&logo=anthropic&logoColor=white" alt="Anthropic Prize" /></a>
+  &nbsp;
+  <a href="https://openai.com/contest"><img src="https://img.shields.io/badge/OpenAI-Contest%20Sponsor-10A37F?style=for-the-badge&logo=openai&logoColor=white" alt="OpenAI Contest" /></a>
+  &nbsp;
+  <a href="https://x.ai/grok"><img src="https://img.shields.io/badge/xAI-Grok%20Sponsor-000000?style=for-the-badge&logo=x&logoColor=white" alt="xAI Grok" /></a>
+  &nbsp;
+  <a href="https://github.com/features/copilot"><img src="https://img.shields.io/badge/GitHub-Copilot%20Sponsor-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Copilot" /></a>
+</p>
+
+---
+
+## 🚀 Getting Started as a Contributor
+
+### Prerequisites
+
+- A **GitHub** account
+- A **Phantom** wallet (Solana mobile or extension) — [phantom.app](https://phantom.app)
+- A **Solana** address to receive USDC payouts
+- **Public** repo access (you can work on any open-source project with bounties)
+
+### Step 1: Browse Open Bounties
+
+Visit [collaborators.build](https://collaborators.build) to browse funded issues. Each bounty shows:
+
+- 💰 **Reward amount** in USDC
+- 📂 **Repository** and issue link
+- 🎯 **Difficulty** and required skills
+- ⏰ **Deadline** (if any)
+
+### Step 2: Log In with GitHub
+
+Click **"Log in with GitHub"** on [collaborators.build](https://collaborators.build). Authorize the OAuth app — you'll be redirected back with your dashboard.
+
+### Step 3: Connect Your Phantom Wallet
+
+In your dashboard, click **"Link Wallet"** and paste your Solana address:
+
+```
+Phantom → Receive → Copy Address
+```
+
+Your address looks like `8zRifG6JruqFEzU69gepZmJcLAbNyCvMvsTgmu9MobJS` (base58, ~44 characters).
+
+### Step 4: Solve and Submit
+
+1. Open the bounty issue on GitHub
+2. Comment to claim the issue
+3. Submit a pull request that closes the issue
+4. Reference the issue number in your PR (`Closes #123`)
+
+### Step 5: Get Paid
+
+Once your PR is merged, our bot verifies the link and releases the USDC. Payment arrives in your Phantom wallet **typically within 5 minutes** of merge.
+
+---
+
+## 💼 Getting Started as a Project Maintainer
+
+### Why Post a Bounty?
+
+- **Get unstuck** on issues that have been sitting for months
+- **Tap into** the broader Solana + Web3 developer community
+- **Pay only for results** — USDC stays in escrow until the PR merges
+
+### How to Post a Bounty
+
+1. **Add the `bounty` label** to your GitHub issue
+2. **Install our GitHub App** at [github.com/apps/collaborators-bot](https://github.com/apps/collaborators-bot)
+3. **Fund the bounty** in USDC from your dashboard
+4. **Wait for PRs** — payments auto-release on merge
+
+Minimum bounty: **$10 USDC**. Recommended: **$50–$500** for typical issues.
+
+---
+
+## ❓ FAQ
+
+### Do I need to pay to use Collaborators?
+
+**No.** Browsing bounties and submitting pull requests is free. We charge a small platform fee (5%) on bounties that successfully pay out.
+
+### Which wallets are supported?
+
+Currently **Phantom on Solana** (mobile iOS/Android + browser extension). USDC on Solana (SPL token) is the only payout currency.
+
+### How fast is payout?
+
+Most bounties pay out **within 5 minutes** of PR merge. The bot verifies the GitHub event, releases the on-chain escrow, and the USDC arrives in your wallet.
+
+### Can I post a bounty on a private repo?
+
+**No** — bounties are only supported on **public** GitHub repositories. This ensures transparency and verifiability.
+
+### What happens if my PR is closed without merging?
+
+No payment. The bounty stays in escrow and can be reassigned. Once a *different* PR that closes the issue is merged, *that* PR author receives the payout.
+
+### Are bounties taxed?
+
+Yes — USDC is a taxable asset in most jurisdictions. Keep records of your bounty earnings. We provide a transaction history in your dashboard for tax purposes.
+
+### What if there's a dispute?
+
+The bounty creator can dispute a payout within 24 hours of merge. Disputes are reviewed by Collaborators admin and resolved within 72 hours.
+
+---
+
+## 🛠️ Tech Stack
+
+Collaborators is built on:
+
+| Layer | Tech |
+|---|---|
+| **Frontend** | Next.js 14, React, TypeScript, Tailwind CSS |
+| **Backend** | Next.js API routes, Prisma ORM |
+| **Database** | PostgreSQL |
+| **Auth** | GitHub OAuth + NextAuth |
+| **Blockchain** | Solana (USDC SPL token), Phantom wallet adapter |
+| **Hosting** | Vercel |
+| **Bot** | GitHub App (event listener for issue + PR events) |
+
+---
+
+## 🔐 Security
+
+- **USDC escrow** is held in a Solana program-controlled wallet, not a company-controlled hot wallet
+- **OAuth scopes** are minimal — we only request read access to public repos
+- **Wallet custody** is yours — we never hold your private keys
+- **Open source** — this repository is public; audit our code anytime
+
+Report vulnerabilities: **security@collaborators.build**
+
+---
+
+## 🌟 Community & Support
+
+- 💬 **Discord**: [discord.gg/collaborators](https://discord.gg/collaborators)
+- 🐦 **Twitter / X**: [@collaboratorsbld](https://twitter.com/collaboratorsbld)
+- 📧 **Email**: hello@collaborators.build
+- 🐛 **Issues**: [github.com/andr-drgm/collaborators/issues](https://github.com/andr-drgm/collaborators/issues)
+
+---
+
+## 🤝 Contributing
+
+This is an open-source project — PRs welcome!
+
+- 🐛 **Bug fixes** — See [issues labeled `bug`](https://github.com/andr-drgm/collaborators/issues?q=label%3Abug)
+- ✨ **Features** — See [issues labeled `enhancement`](https://github.com/andr-drgm/collaborators/issues?q=label%3Aenhancement)
+- 📖 **Docs** — Improve this README, add guides, fix typos
+
+Please read our [Contributing Guide](CONTRIBUTING.md) before opening a PR.
+
+---
+
+## 📄 License
+
+MIT © Collaborators Contributors — see [LICENSE](LICENSE)
+
+---
+
+<sub>🌐 Built with ❤️ on Solana · Maintained by [@andr-drgm](https://github.com/andr-drgm)</sub>
